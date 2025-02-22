@@ -1,0 +1,3 @@
+= MySQL Slow Log Analyzer image:https://img.shields.io/github/actions/workflow/status/awesome-java-web/mysql-slow-log-analyzer/maven.yml[build] image:https://img.shields.io/codecov/c/github/awesome-java-web/mysql-slow-log-analyzer?color=brightgreen[coverage] image:https://sonarcloud.io/api/project_badges/measure?project=awesome-java-web_mysql-slow-log-analyzer&metric=code_smells[code_smells]
+
+This project is a Java-based MySQL slow log analyzer. It reads MySQL slow log files from local disk or remote server and generates a report. The report contains a list of slow queries, query time distribution, and other useful information. You can use this tool to analyze MySQL slow logs and optimize your database performance, or integrate it as middleware into your projects.

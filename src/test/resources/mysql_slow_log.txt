@@ -1,0 +1,105 @@
+# Time: 2025-02-18T09:59:58.187519Z
+# User@Host: cpos_df[cpos_df] @  [10.37.58.81]  Id: 497591
+# Query_time: 0.909278  Lock_time: 0.000091 Rows_sent: 2144  Rows_examined: 2144
+SET timestamp=1739872798;
+SELECT
+  DATE_FORMAT(sale_dt, '%Y-%m-%d %T') saleDt,
+  round(total_amt, 2) totalAmt,
+  total_discount totalDiscount,
+  IF(mem_input_code = '', '', mem_user_id) ecardNo,
+  mem_input_code inputCode,
+  CONCAT(
+    DATE_FORMAT(sale_dt, '%d%m%y'),
+    if(LENGTH(org_no) < 6, LPAD(org_no, 6, '0'), org_no),
+    LPAD(pos_id, 3, '0'),
+    LPAD(sale_id, 4, '0')
+  ) saleNo,
+  sale_ext_info saleExtInfo
+FROM
+  sale_95
+where
+  sale_dt between '2025-02-12 00:00:00' and '2025-02-18 23:59:59'
+  AND org_no = '488'
+  AND pos_id = '61'
+  AND total_amt between 0.0 and 1.0E + 13
+ORDER BY
+  sale_dt DESC;
+# Time: 2025-02-18T10:00:03.882739Z
+# User@Host: cpos_df[cpos_df] @  [10.37.41.47]  Id: 524846
+# Query_time: 0.658847  Lock_time: 0.000090 Rows_sent: 1464  Rows_examined: 1464
+SET timestamp=1739872803;
+SELECT
+  DATE_FORMAT(sale_dt, '%Y-%m-%d %T') saleDt,
+  round(total_amt, 2) totalAmt,
+  total_discount totalDiscount,
+  IF(mem_input_code = '', '', mem_user_id) ecardNo,
+  mem_input_code inputCode,
+  CONCAT(
+    DATE_FORMAT(sale_dt, '%d%m%y'),
+    if(LENGTH(org_no) < 6, LPAD(org_no, 6, '0'), org_no),
+    LPAD(pos_id, 3, '0'),
+    LPAD(sale_id, 4, '0')
+  ) saleNo,
+  sale_ext_info saleExtInfo
+FROM
+  sale_45
+where
+  sale_dt between '2025-02-12 00:00:00' and '2025-02-18 23:59:59'
+  AND org_no = '220'
+  AND pos_id = '62'
+  AND total_amt between 0.0 and 1.0E + 13
+ORDER BY
+  sale_dt DESC;
+# Time: 2025-02-18T10:00:11.668906Z
+# User@Host: cpos_df[cpos_df] @  [10.39.207.198]  Id: 523618
+# Query_time: 0.213259  Lock_time: 0.000122 Rows_sent: 1  Rows_examined: 2084
+SET timestamp=1739872811;
+select
+  t.get_type getType,
+  sum(t.get_amt) getAmt
+from
+  (
+    select
+      a.get_type,
+      a.get_amt
+    from
+      petty_cash a
+    where
+      a.group_no = '10'
+      and a.vender_no = '5'
+      and a.region_no = '300'
+      and a.org_no = '180'
+      and a.pos_id = '1'
+      and CURDATE() = a.pettycash_date
+      and (
+        (
+          a.operation_dt >= '2025-02-17 21:10:16'
+          and a.operation_dt <= '2025-02-18 18:00:11'
+        )
+        or (
+          a.pettycash_date >= '2025-02-17 21:10:16'
+          and a.pettycash_date <= '2025-02-18 18:00:11'
+        )
+      )
+    union all
+    select
+      a.get_type,
+      a.get_amt
+    from
+      petty_cash a
+    where
+      a.group_no = '10'
+      and a.vender_no = '5'
+      and a.region_no = '300'
+      and a.org_no = '180'
+      and a.pos_id = '1'
+      and CURDATE() > a.pettycash_date
+      and (
+        (
+          a.operation_dt >= '2025-02-17 21:10:16'
+          and a.operation_dt <= '2025-02-18 18:00:11'
+        )
+      )
+  ) t
+group by
+  get_type;
