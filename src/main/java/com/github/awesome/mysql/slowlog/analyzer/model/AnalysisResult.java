@@ -6,12 +6,19 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
 @Setter
 @ToString
 public class AnalysisResult implements Serializable {
+
+    private int totalSlowQueries;
+
+    private BigDecimal averageQueryTimeMillis;
+
+    private BigDecimal averageLockTimeMillis;
 
     private AnalyzableLogEntry slowestQuery;
 

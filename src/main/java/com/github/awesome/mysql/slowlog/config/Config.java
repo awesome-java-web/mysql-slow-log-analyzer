@@ -15,6 +15,9 @@ public class Config implements Serializable {
     @JsonProperty("slow-log-path")
     private String slowLogPath;
 
+    @JsonProperty("analysis-report-path")
+    private String analysisReportPath;
+
     @JsonProperty("slow-query-threshold")
     private int slowQueryThreshold;
 

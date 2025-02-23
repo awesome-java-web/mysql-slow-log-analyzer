@@ -23,6 +23,7 @@ public class ConfigLoader {
 
     public Config loadDefault() {
         Config config = new Config();
+        config.setAnalysisReportPath("target/");
         config.setSlowQueryThreshold(500);
         config.setTopSlowQueries(10);
         config.setTopLockTimeQueries(10);
