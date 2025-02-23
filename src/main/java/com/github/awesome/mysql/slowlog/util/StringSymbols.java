@@ -1,17 +1,17 @@
 package com.github.awesome.mysql.slowlog.util;
 
-public final class StringSymbols {
+public interface StringSymbols {
 
-    public static final String AT = "@";
+    String AT = "@";
 
-    public static final String EMPTY = "";
+    String EMPTY = "";
 
-    public static final String SPACE = " ";
+    String SPACE = " ";
 
-    public static final String SEMICOLON = ";";
+    String SEMICOLON = ";";
 
-    public static final String SQUARE_BRACKET_LEFT = "[";
+    String SQUARE_BRACKET_LEFT = "[";
 
-    public static final String SQUARE_BRACKET_RIGHT = "]";
+    String SQUARE_BRACKET_RIGHT = "]";
 
 }

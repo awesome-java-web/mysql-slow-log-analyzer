@@ -8,6 +8,10 @@ public final class DigestHelper {
 
     private static final String MD5 = "MD5";
 
+    private DigestHelper() {
+        throw new UnsupportedOperationException("Utility class should not be instantiated");
+    }
+
     public static String md5Base64Hash(final String input) {
         try {
             MessageDigest md5 = MessageDigest.getInstance(MD5);

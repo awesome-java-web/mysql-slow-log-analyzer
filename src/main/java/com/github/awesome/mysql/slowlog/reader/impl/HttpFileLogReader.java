@@ -36,7 +36,6 @@ public class HttpFileLogReader implements RemoteFileLogReader {
             final String localFileIdentifier = DigestHelper.md5Base64Hash(url);
             Path outputPath = Paths.get(String.format("mysql_slow_log_%s.txt", localFileIdentifier));
             Files.copy(byteStream, outputPath, StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("Downloaded file to " + outputPath);
             return outputPath;
         } catch (Exception e) {
             throw new HttpRemoteFileDownloadException("Failed to download file from " + url, e);
