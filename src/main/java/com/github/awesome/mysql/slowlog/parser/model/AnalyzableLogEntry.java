@@ -34,6 +34,8 @@ public class AnalyzableLogEntry implements Serializable {
 
     private long timestamp;
 
+    private String datetime;
+
     private String sql;
 
 }

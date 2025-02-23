@@ -2,14 +2,17 @@ package com.github.awesome.mysql.slowlog.parser.impl;
 
 import com.github.awesome.mysql.slowlog.config.Config;
 import com.github.awesome.mysql.slowlog.enums.LogLineIdentifier;
+import com.github.awesome.mysql.slowlog.enums.StringSymbols;
 import com.github.awesome.mysql.slowlog.parser.LogParser;
 import com.github.awesome.mysql.slowlog.parser.model.AnalyzableLogEntry;
 import com.github.awesome.mysql.slowlog.parser.model.ParsableLogEntry;
-import com.github.awesome.mysql.slowlog.enums.StringSymbols;
 import lombok.AllArgsConstructor;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -41,6 +44,7 @@ public abstract class AbstractLogParser implements LogParser {
             analyzableLogEntry.setRowsExamined(parseRowsExamined(parsableLogEntry));
             analyzableLogEntry.setRowsEfficiency(calculateRowsEfficiency(analyzableLogEntry));
             analyzableLogEntry.setTimestamp(parseTimestamp(parsableLogEntry));
+            analyzableLogEntry.setDatetime(formatTimestamp(analyzableLogEntry.getTimestamp()));
             analyzableLogEntry.setSql(parsableLogEntry.getSql());
             analyzableLogEntries.add(analyzableLogEntry);
         }
@@ -83,6 +87,12 @@ public abstract class AbstractLogParser implements LogParser {
         BigDecimal rowsSent = BigDecimal.valueOf(analyzableLogEntry.getRowsSent());
         BigDecimal rowsExamined = BigDecimal.valueOf(analyzableLogEntry.getRowsExamined());
         return rowsSent.divide(rowsExamined, AnalyzableLogEntry.DEFAULT_BIG_DECIMAL_SCALE, RoundingMode.HALF_UP);
+    }
+
+    private String formatTimestamp(long timestamp) {
+        return Instant.ofEpochSecond(timestamp)
+            .atZone(ZoneId.systemDefault())
+            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
 }

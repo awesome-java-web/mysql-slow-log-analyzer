@@ -160,78 +160,38 @@
       </div>
     </div>
 
-    <h2>慢查询列表</h2>
+    <h2>Top {{topSlowQueries}} Slow Queries</h2>
     <table>
       <thead>
         <tr>
-          <th>时间</th>
-          <th>数据库</th>
-          <th>耗时</th>
-          <th>扫描行数</th>
-          <th>返回行数</th>
-          <th>SQL语句</th>
+          <th>Time</th>
+          <th>Database</th>
+          <th>Query Time</th>
+          <th>Rows Sent</th>
+          <th>Rows Examined</th>
+          <th>SQL</th>
         </tr>
       </thead>
-      <tbody id="queryList">
-        <!-- 示例数据 - 用真实数据替换 -->
-        <tr>
-          <td>2024-03-20 14:32:15</td>
-          <td><span class="db-tag">order_db</span></td>
-          <td class="query-time">8.91s</td>
-          <td>892,145</td>
-          <td>1,235</td>
-          <td><code>SELECT * FROM orders WHERE ...</code></td>
-        </tr>
-        <tr>
-          <td>2024-03-20 11:15:47</td>
-          <td><span class="db-tag">user_db</span></td>
-          <td class="query-time">5.23s</td>
-          <td>234,567</td>
-          <td>42</td>
-          <td><code>UPDATE users SET ...</code></td>
-        </tr>
-      </tbody>
+      <tbody id="top-slow-queries-list"></tbody>
     </table>
   </div>
 
   <script>
-    // 示例数据 - 替换为真实数据
-    const slowQueries = [
-      {
-        timestamp: "2024-03-20 14:32:15",
-        database: "order_db",
-        queryTime: 8.91,
-        rowsExamined: 892145,
-        rowsSent: 1235,
-        sql: "SELECT * FROM orders WHERE ..."
-      },
-      {
-        timestamp: "2024-03-20 11:15:47",
-        database: "user_db",
-        queryTime: 5.23,
-        rowsExamined: 234567,
-        rowsSent: 42,
-        sql: "UPDATE users SET ..."
-      }
-    ];
-
-    // 动态生成表格内容
-    function renderTable() {
-      const tbody = document.getElementById('queryList');
-      tbody.innerHTML = slowQueries.map(query => `
-            <tr>
-                <td>${query.timestamp}</td>
-                <td><span class="db-tag">${query.database}</span></td>
-                <td class="query-time">${query.queryTime.toFixed(2)}s</td>
-                <td>${query.rowsExamined.toLocaleString()}</td>
-                <td>${query.rowsSent.toLocaleString()}</td>
-                <td><code>${query.sql}</code></td>
-            </tr>
-        `).join('');
+    const topSlowQueries = [];
+    function renderTopSlowQueriesTable() {
+      const tbody = document.getElementById('top-slow-queries-list');
+      tbody.innerHTML = topSlowQueries.map(query => `
+        <tr>
+          <td>${query.datetime}</td>
+          <td><span class="db-tag">${query.database}</span></td>
+          <td class="query-time">${query.queryTimeMillis}ms</td>
+          <td>${query.rowsSent.toLocaleString()}</td>
+          <td>${query.rowsExamined.toLocaleString()}</td>
+          <td><code>${query.sql}</code></td>
+        </tr>
+      `).join('');
     }
-
-    // 初始化
-    renderTable();
+    renderTopSlowQueriesTable();
   </script>
 </body>
 

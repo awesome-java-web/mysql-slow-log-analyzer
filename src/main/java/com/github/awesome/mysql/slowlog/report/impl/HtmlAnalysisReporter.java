@@ -1,5 +1,7 @@
 package com.github.awesome.mysql.slowlog.report.impl;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.awesome.mysql.slowlog.analyzer.model.AnalysisResult;
 import com.github.awesome.mysql.slowlog.config.Config;
 import com.github.awesome.mysql.slowlog.enums.StringSymbols;
@@ -41,6 +43,7 @@ public class HtmlAnalysisReporter implements AnalysisReporter {
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
             BufferedReader reader = new BufferedReader(inputStreamReader);
             final String template = reader.lines().collect(joining(StringSymbols.SPACE.getSymbol()));
+            ObjectMapper mapper = new ObjectMapper(new JsonFactory());
             final String html = template
                 .replace("{{totalSlowQueries}}", String.valueOf(result.getTotalSlowQueries()))
                 .replace("{{averageQueryTimeMillis}}", result.getAverageQueryTimeMillis().toPlainString())
@@ -54,7 +57,9 @@ public class HtmlAnalysisReporter implements AnalysisReporter {
                     .movePointRight(2)
                     .setScale(2, RoundingMode.HALF_UP)
                     .toPlainString()
-                );
+                )
+                .replace("{{topSlowQueries}}", String.valueOf(config.getTopSlowQueries()))
+                .replace("const topSlowQueries = []", "const topSlowQueries = " + mapper.writeValueAsString(result.getTopSlowQueries()));
             final String reportName = reportTemplateName.replace("-template", StringSymbols.EMPTY.getSymbol());
             Files.write(Paths.get(config.getAnalysisReportPath(), reportName), html.getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
