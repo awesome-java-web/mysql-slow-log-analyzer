@@ -1,10 +1,12 @@
 package com.github.awesome.mysql.slowlog.parser.impl;
 
+import com.github.awesome.mysql.slowlog.config.Config;
 import com.github.awesome.mysql.slowlog.enums.LogLineIdentifier;
 import com.github.awesome.mysql.slowlog.parser.LogParser;
 import com.github.awesome.mysql.slowlog.parser.model.AnalyzableLogEntry;
 import com.github.awesome.mysql.slowlog.parser.model.ParsableLogEntry;
 import com.github.awesome.mysql.slowlog.util.StringSymbols;
+import lombok.AllArgsConstructor;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -14,19 +16,26 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
 
+@AllArgsConstructor
 public abstract class AbstractLogParser implements LogParser {
+
+    protected final Config config;
 
     @Override
     public List<AnalyzableLogEntry> parse(Stream<String> stream) {
         List<AnalyzableLogEntry> analyzableLogEntries = new ArrayList<>();
         List<ParsableLogEntry> parsableLogEntries = transform(stream);
         for (ParsableLogEntry parsableLogEntry : parsableLogEntries) {
+            BigDecimal queryTimeMillis = parseQueryTimeMillis(parsableLogEntry);
+            if (queryTimeMillis.compareTo(BigDecimal.valueOf(config.getSlowQueryThreshold())) < 0) {
+                continue;
+            }
             AnalyzableLogEntry analyzableLogEntry = new AnalyzableLogEntry();
             analyzableLogEntry.setIdentifier(generateIdentifier(parsableLogEntry));
             analyzableLogEntry.setUser(parseUser(parsableLogEntry));
             analyzableLogEntry.setHost(parseHost(parsableLogEntry));
-            analyzableLogEntry.setQueryTime(parseQueryTime(parsableLogEntry));
-            analyzableLogEntry.setLockTime(parseLockTime(parsableLogEntry));
+            analyzableLogEntry.setQueryTimeMillis(queryTimeMillis);
+            analyzableLogEntry.setLockTimeMillis(parseLockTimeMillis(parsableLogEntry));
             analyzableLogEntry.setRowsSent(parseRowsSent(parsableLogEntry));
             analyzableLogEntry.setRowsExamined(parseRowsExamined(parsableLogEntry));
             analyzableLogEntry.setRowsEfficiency(calculateRowsEfficiency(analyzableLogEntry));

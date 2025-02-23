@@ -1,5 +1,6 @@
 package com.github.awesome.mysql.slowlog.parser.impl;
 
+import com.github.awesome.mysql.slowlog.config.Config;
 import com.github.awesome.mysql.slowlog.enums.LogLineIdentifier;
 import com.github.awesome.mysql.slowlog.parser.model.ParsableLogEntry;
 import com.github.awesome.mysql.slowlog.util.DigestHelper;
@@ -12,6 +13,10 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 
 public class DefaultLogParser extends AbstractLogParser {
+
+    public DefaultLogParser(Config config) {
+        super(config);
+    }
 
     @Override
     public String generateIdentifier(ParsableLogEntry segment) {
@@ -29,13 +34,13 @@ public class DefaultLogParser extends AbstractLogParser {
     }
 
     @Override
-    public BigDecimal parseQueryTime(ParsableLogEntry segment) {
-        return new BigDecimal(parsePerformanceCriteria(segment)[0]);
+    public BigDecimal parseQueryTimeMillis(ParsableLogEntry segment) {
+        return new BigDecimal(parsePerformanceCriteria(segment)[0]).movePointRight(3);
     }
 
     @Override
-    public BigDecimal parseLockTime(ParsableLogEntry segment) {
-        return new BigDecimal(parsePerformanceCriteria(segment)[1]);
+    public BigDecimal parseLockTimeMillis(ParsableLogEntry segment) {
+        return new BigDecimal(parsePerformanceCriteria(segment)[1]).movePointRight(3);
     }
 
     @Override

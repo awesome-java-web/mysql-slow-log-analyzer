@@ -1,14 +1,19 @@
 package com.github.awesome.mysql.slowlog.analyzer;
 
 import com.github.awesome.mysql.slowlog.analyzer.model.AnalysisResult;
+import com.github.awesome.mysql.slowlog.config.Config;
 import com.github.awesome.mysql.slowlog.parser.model.AnalyzableLogEntry;
+import lombok.AllArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
+@AllArgsConstructor
 public class QueryAnalyzer {
+
+    private final Config config;
 
     public AnalysisResult analyze(List<AnalyzableLogEntry> entries) {
         AnalysisResult result = new AnalysisResult();
@@ -29,8 +34,8 @@ public class QueryAnalyzer {
         BigDecimal longestQueryTime = BigDecimal.ZERO;
         AnalyzableLogEntry slowestQuery = null;
         for (AnalyzableLogEntry entry : entries) {
-            if (entry.getQueryTime().compareTo(longestQueryTime) > 0) {
-                longestQueryTime = entry.getQueryTime();
+            if (entry.getQueryTimeMillis().compareTo(longestQueryTime) > 0) {
+                longestQueryTime = entry.getQueryTimeMillis();
                 slowestQuery = entry;
             }
         }
@@ -41,8 +46,8 @@ public class QueryAnalyzer {
         BigDecimal longestLockTime = BigDecimal.ZERO;
         AnalyzableLogEntry longestLockTimeQuery = null;
         for (AnalyzableLogEntry entry : entries) {
-            if (entry.getLockTime().compareTo(longestLockTime) > 0) {
-                longestLockTime = entry.getLockTime();
+            if (entry.getLockTimeMillis().compareTo(longestLockTime) > 0) {
+                longestLockTime = entry.getLockTimeMillis();
                 longestLockTimeQuery = entry;
             }
         }
@@ -87,29 +92,29 @@ public class QueryAnalyzer {
 
     private List<AnalyzableLogEntry> findTopSlowQueries(List<AnalyzableLogEntry> entries) {
         return entries.stream()
-            .sorted((e1, e2) -> e2.getQueryTime().compareTo(e1.getQueryTime()))
-            .limit(10)
+            .sorted((e1, e2) -> e2.getQueryTimeMillis().compareTo(e1.getQueryTimeMillis()))
+            .limit(config.getTopSlowQueries())
             .collect(toList());
     }
 
     private List<AnalyzableLogEntry> findTopLockTimeQueries(List<AnalyzableLogEntry> entries) {
         return entries.stream()
-            .sorted((e1, e2) -> e2.getLockTime().compareTo(e1.getLockTime()))
-            .limit(10)
+            .sorted((e1, e2) -> e2.getLockTimeMillis().compareTo(e1.getLockTimeMillis()))
+            .limit(config.getTopLockTimeQueries())
             .collect(toList());
     }
 
     private List<AnalyzableLogEntry> findTopRowsSentQueries(List<AnalyzableLogEntry> entries) {
         return entries.stream()
             .sorted((e1, e2) -> Long.compare(e2.getRowsSent(), e1.getRowsSent()))
-            .limit(10)
+            .limit(config.getTopRowsSentQueries())
             .collect(toList());
     }
 
     private List<AnalyzableLogEntry> findTopRowsExaminedQueries(List<AnalyzableLogEntry> entries) {
         return entries.stream()
             .sorted((e1, e2) -> Long.compare(e2.getRowsExamined(), e1.getRowsExamined()))
-            .limit(10)
+            .limit(config.getTopRowsExaminedQueries())
             .collect(toList());
     }
 
@@ -119,7 +124,7 @@ public class QueryAnalyzer {
                 final int compareResult = e1.getRowsEfficiency().compareTo(e2.getRowsEfficiency());
                 return compareResult == 0 ? Long.compare(e2.getRowsExamined(), e1.getRowsExamined()) : compareResult;
             })
-            .limit(10)
+            .limit(config.getTopWorstRowsEfficiencyQueries())
             .collect(toList());
     }
 

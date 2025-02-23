@@ -20,9 +20,9 @@ public class AnalyzableLogEntry implements Serializable {
 
     private String user;
 
-    private BigDecimal queryTime;
+    private BigDecimal queryTimeMillis;
 
-    private BigDecimal lockTime;
+    private BigDecimal lockTimeMillis;
 
     private long rowsSent;
 

@@ -16,9 +16,9 @@ public interface LogParser {
 
     String parseHost(ParsableLogEntry segment);
 
-    BigDecimal parseQueryTime(ParsableLogEntry segment);
+    BigDecimal parseQueryTimeMillis(ParsableLogEntry segment);
 
-    BigDecimal parseLockTime(ParsableLogEntry segment);
+    BigDecimal parseLockTimeMillis(ParsableLogEntry segment);
 
     long parseRowsSent(ParsableLogEntry segment);
 

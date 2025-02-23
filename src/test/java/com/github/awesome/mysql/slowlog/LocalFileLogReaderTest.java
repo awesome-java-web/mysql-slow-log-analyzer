@@ -2,6 +2,8 @@ package com.github.awesome.mysql.slowlog;
 
 import com.github.awesome.mysql.slowlog.analyzer.QueryAnalyzer;
 import com.github.awesome.mysql.slowlog.analyzer.model.AnalysisResult;
+import com.github.awesome.mysql.slowlog.config.Config;
+import com.github.awesome.mysql.slowlog.config.ConfigLoader;
 import com.github.awesome.mysql.slowlog.parser.LogParser;
 import com.github.awesome.mysql.slowlog.parser.impl.DefaultLogParser;
 import com.github.awesome.mysql.slowlog.parser.model.AnalyzableLogEntry;
@@ -21,16 +23,17 @@ class LocalFileLogReaderTest {
 
     @Test
     void testLocalFileLogReader() throws IOException {
-        final String logFilePath = "src/test/resources/mysql_slow_log.txt";
+        ConfigLoader configLoader = new ConfigLoader();
+        Config config = configLoader.loadFromFile();
         LogReader localFileLogReader = new LocalFileLogReader();
-        Stream<String> logStream = localFileLogReader.readAsStream(logFilePath);
-        LogParser defaultLogParser = new DefaultLogParser();
+        Stream<String> logStream = localFileLogReader.readAsStream(config.getSlowLogPath());
+        LogParser defaultLogParser = new DefaultLogParser(config);
         List<AnalyzableLogEntry> analyzableLogEntries = defaultLogParser.parse(logStream);
-        QueryAnalyzer queryAnalyzer = new QueryAnalyzer();
+        QueryAnalyzer queryAnalyzer = new QueryAnalyzer(config);
         AnalysisResult analysisResult = queryAnalyzer.analyze(analyzableLogEntries);
         assertEquals(3, analyzableLogEntries.size());
-        assertEquals("0.909278", analysisResult.getSlowestQuery().getQueryTime().toPlainString());
-        assertEquals("0.000122", analysisResult.getLongestLockTimeQuery().getLockTime().toPlainString());
+        assertEquals("909.278", analysisResult.getSlowestQuery().getQueryTimeMillis().toPlainString());
+        assertEquals("0.122", analysisResult.getLongestLockTimeQuery().getLockTimeMillis().toPlainString());
         assertEquals(2144, analysisResult.getMaxRowsSentQuery().getRowsSent());
         assertEquals(2144, analysisResult.getMaxRowsExaminedQuery().getRowsExamined());
         assertEquals(
