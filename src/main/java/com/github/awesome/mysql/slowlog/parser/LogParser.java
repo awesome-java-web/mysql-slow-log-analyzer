@@ -10,19 +10,21 @@ import java.util.stream.Stream;
 public interface LogParser {
     List<AnalyzableLogEntry> parse(Stream<String> stream);
 
-    String generateIdentifier(ParsableLogEntry segment);
+    String generateIdentifier(ParsableLogEntry entry);
 
-    String parseUser(ParsableLogEntry segment);
+    String parseUser(ParsableLogEntry entry);
 
-    String parseHost(ParsableLogEntry segment);
+    String parseDatabase(ParsableLogEntry entry);
 
-    BigDecimal parseQueryTimeMillis(ParsableLogEntry segment);
+    String parseHost(ParsableLogEntry entry);
 
-    BigDecimal parseLockTimeMillis(ParsableLogEntry segment);
+    BigDecimal parseQueryTimeMillis(ParsableLogEntry entry);
 
-    long parseRowsSent(ParsableLogEntry segment);
+    BigDecimal parseLockTimeMillis(ParsableLogEntry entry);
 
-    long parseRowsExamined(ParsableLogEntry segment);
+    long parseRowsSent(ParsableLogEntry entry);
 
-    long parseTimestamp(ParsableLogEntry segment);
+    long parseRowsExamined(ParsableLogEntry entry);
+
+    long parseTimestamp(ParsableLogEntry entry);
 }

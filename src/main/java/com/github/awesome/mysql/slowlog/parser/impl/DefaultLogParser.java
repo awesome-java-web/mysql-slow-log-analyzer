@@ -19,51 +19,60 @@ public class DefaultLogParser extends AbstractLogParser {
     }
 
     @Override
-    public String generateIdentifier(ParsableLogEntry segment) {
-        return DigestHelper.md5Base64Hash(segment.getSql());
+    public String generateIdentifier(ParsableLogEntry entry) {
+        return DigestHelper.md5Base64Hash(entry.getSql());
     }
 
     @Override
-    public String parseUser(ParsableLogEntry segment) {
-        return parseUserAndHost(segment)[0];
+    public String parseUser(ParsableLogEntry entry) {
+        final String userAndDatabase = parseUserAndHost(entry)[0];
+        return userAndDatabase.split(StringSymbols.SQUARE_BRACKET_LEFT.getSymbol())[0];
     }
 
     @Override
-    public String parseHost(ParsableLogEntry segment) {
-        return parseUserAndHost(segment)[1];
+    public String parseDatabase(ParsableLogEntry entry) {
+        final String userAndDatabase = parseUserAndHost(entry)[0];
+        return userAndDatabase
+            .split(StringSymbols.SQUARE_BRACKET_LEFT.getSymbol())[1]
+            .replace(StringSymbols.SQUARE_BRACKET_RIGHT.getSymbol(), StringSymbols.EMPTY.getSymbol());
     }
 
     @Override
-    public BigDecimal parseQueryTimeMillis(ParsableLogEntry segment) {
-        return new BigDecimal(parsePerformanceCriteria(segment)[0]).movePointRight(3);
+    public String parseHost(ParsableLogEntry entry) {
+        return parseUserAndHost(entry)[1];
     }
 
     @Override
-    public BigDecimal parseLockTimeMillis(ParsableLogEntry segment) {
-        return new BigDecimal(parsePerformanceCriteria(segment)[1]).movePointRight(3);
+    public BigDecimal parseQueryTimeMillis(ParsableLogEntry entry) {
+        return new BigDecimal(parsePerformanceCriteria(entry)[0]).movePointRight(3);
     }
 
     @Override
-    public long parseRowsSent(ParsableLogEntry segment) {
-        return Long.parseLong(parsePerformanceCriteria(segment)[2]);
+    public BigDecimal parseLockTimeMillis(ParsableLogEntry entry) {
+        return new BigDecimal(parsePerformanceCriteria(entry)[1]).movePointRight(3);
     }
 
     @Override
-    public long parseRowsExamined(ParsableLogEntry segment) {
-        return Long.parseLong(parsePerformanceCriteria(segment)[3]);
+    public long parseRowsSent(ParsableLogEntry entry) {
+        return Long.parseLong(parsePerformanceCriteria(entry)[2]);
     }
 
     @Override
-    public long parseTimestamp(ParsableLogEntry segment) {
-        final String timestamp = segment.getTimestamp()
+    public long parseRowsExamined(ParsableLogEntry entry) {
+        return Long.parseLong(parsePerformanceCriteria(entry)[3]);
+    }
+
+    @Override
+    public long parseTimestamp(ParsableLogEntry entry) {
+        final String timestamp = entry.getTimestamp()
             .replace(LogLineIdentifier.TIMESTAMP.getPrefix(), StringSymbols.EMPTY.getSymbol())
             .trim()
             .replace(StringSymbols.SEMICOLON.getSymbol(), StringSymbols.EMPTY.getSymbol());
         return Long.parseLong(timestamp);
     }
 
-    private String[] parseUserAndHost(ParsableLogEntry segment) {
-        final String temp = segment.getUserAndHost()
+    private String[] parseUserAndHost(ParsableLogEntry entry) {
+        final String temp = entry.getUserAndHost()
             .replace(LogLineIdentifier.USER_AND_HOST.getPrefix(), StringSymbols.EMPTY.getSymbol())
             .trim();
         final int index = temp.lastIndexOf(StringSymbols.SQUARE_BRACKET_RIGHT.getSymbol());
@@ -75,8 +84,8 @@ public class DefaultLogParser extends AbstractLogParser {
         return userAndHost;
     }
 
-    private String[] parsePerformanceCriteria(ParsableLogEntry segment) {
-        String[] tokens = segment.getPerformanceCriteria()
+    private String[] parsePerformanceCriteria(ParsableLogEntry entry) {
+        String[] tokens = entry.getPerformanceCriteria()
             .replace(LogLineIdentifier.PERFORMANCE_CRITERIA.getPrefix(), StringSymbols.EMPTY.getSymbol())
             .trim()
             .split(StringSymbols.SPACE.getSymbol());

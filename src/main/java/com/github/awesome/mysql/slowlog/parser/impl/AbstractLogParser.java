@@ -33,6 +33,7 @@ public abstract class AbstractLogParser implements LogParser {
             AnalyzableLogEntry analyzableLogEntry = new AnalyzableLogEntry();
             analyzableLogEntry.setIdentifier(generateIdentifier(parsableLogEntry));
             analyzableLogEntry.setUser(parseUser(parsableLogEntry));
+            analyzableLogEntry.setDatabase(parseDatabase(parsableLogEntry));
             analyzableLogEntry.setHost(parseHost(parsableLogEntry));
             analyzableLogEntry.setQueryTimeMillis(queryTimeMillis);
             analyzableLogEntry.setLockTimeMillis(parseLockTimeMillis(parsableLogEntry));
