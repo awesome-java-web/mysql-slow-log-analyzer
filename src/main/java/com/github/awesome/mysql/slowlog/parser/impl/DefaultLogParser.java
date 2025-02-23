@@ -26,15 +26,15 @@ public class DefaultLogParser extends AbstractLogParser {
     @Override
     public String parseUser(ParsableLogEntry entry) {
         final String userAndDatabase = parseUserAndHost(entry)[0];
-        return userAndDatabase.split(StringSymbols.SQUARE_BRACKET_LEFT.getSymbol())[0];
+        final int leftBracketIndex = userAndDatabase.indexOf(StringSymbols.SQUARE_BRACKET_LEFT.getSymbol());
+        return userAndDatabase.substring(0, leftBracketIndex);
     }
 
     @Override
     public String parseDatabase(ParsableLogEntry entry) {
         final String userAndDatabase = parseUserAndHost(entry)[0];
-        return userAndDatabase
-            .split(StringSymbols.SQUARE_BRACKET_LEFT.getSymbol())[1]
-            .replace(StringSymbols.SQUARE_BRACKET_RIGHT.getSymbol(), StringSymbols.EMPTY.getSymbol());
+        final int leftBracketIndex = userAndDatabase.indexOf(StringSymbols.SQUARE_BRACKET_LEFT.getSymbol());
+        return userAndDatabase.substring(leftBracketIndex + 1, userAndDatabase.length() - 1);
     }
 
     @Override
