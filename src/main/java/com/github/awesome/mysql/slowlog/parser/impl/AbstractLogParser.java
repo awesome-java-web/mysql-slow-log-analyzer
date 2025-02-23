@@ -5,7 +5,7 @@ import com.github.awesome.mysql.slowlog.enums.LogLineIdentifier;
 import com.github.awesome.mysql.slowlog.parser.LogParser;
 import com.github.awesome.mysql.slowlog.parser.model.AnalyzableLogEntry;
 import com.github.awesome.mysql.slowlog.parser.model.ParsableLogEntry;
-import com.github.awesome.mysql.slowlog.util.StringSymbols;
+import com.github.awesome.mysql.slowlog.enums.StringSymbols;
 import lombok.AllArgsConstructor;
 
 import java.math.BigDecimal;
@@ -73,7 +73,7 @@ public abstract class AbstractLogParser implements LogParser {
         parsableLogEntry.setPerformanceCriteria(rawLogLines.get(LogLineIdentifier.PERFORMANCE_CRITERIA.getIndex()));
         parsableLogEntry.setTimestamp(rawLogLines.get(LogLineIdentifier.TIMESTAMP.getIndex()));
         List<String> sqlStatements = rawLogLines.subList(LogLineIdentifier.SQL.getIndex(), rawLogLines.size());
-        final String sql = sqlStatements.stream().map(String::trim).collect(joining(StringSymbols.SPACE));
+        final String sql = sqlStatements.stream().map(String::trim).collect(joining(StringSymbols.SPACE.getSymbol()));
         parsableLogEntry.setSql(sql);
         return parsableLogEntry;
     }
