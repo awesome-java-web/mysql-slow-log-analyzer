@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${title}">Default Title</title>
+  <style>
+    :root {
+      --primary: #2c3e50;
+      --secondary: #3498db;
+      --light: #f8f9fa;
+      --success: #27ae60;
+      --danger: #e74c3c;
+    }
+
+    * {
+      margin: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    body {
+      line-height: 1.6;
+      padding: 2rem 1rem;
+      background: #f1f4f8;
+    }
+
+    .container {
+      margin: 0 auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      margin-bottom: 2rem;
+      font-size: 2.2em;
+      text-align: center;
+      color: var(--primary);
+    }
+
+    .stats-grid {
+      display: grid;
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+
+    .stat-card {
+      padding: 1.5rem;
+      border-radius: 8px;
+      background: var(--light);
+      border-left: 4px solid var(--secondary);
+    }
+
+    .stat-value {
+      font-size: 2em;
+      font-weight: bold;
+      color: var(--primary);
+    }
+
+    .stat-label {
+      font-size: 0.9em;
+      color: #7f8c8d;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 1rem;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      width: 0;
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      color: white;
+      background: var(--primary);
+    }
+
+    tr:hover {
+      background-color: #f5f5f5;
+    }
+
+    .query-time {
+      font-weight: bold;
+      color: var(--danger);
+    }
+
+    .db-tag {
+      display: inline-block;
+      padding: 4px 8px;
+      font-size: 0.8em;
+      border-radius: 4px;
+      color: white;
+      background: var(--success);
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<div class="container">
+  <h1 th:text="${title}">Default Title</h1>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value" th:text="${totalSlowQueries}">0</div>
+      <div class="stat-label" th:text="${totalSlowQueriesLabel}">totalSlowQueriesLabel</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" th:text="${averageQueryTimeMillis}">0ms</div>
+      <div class="stat-label" th:text="${averageQueryTimeLabel}">averageQueryTimeLabel</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" th:text="${slowestQueryTimeMillis}">0ms</div>
+      <div class="stat-label" th:text="${slowestQueryTimeLabel}">slowestQueryTimeLabel</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" th:text="${averageLockTimeMillis}">0ms</div>
+      <div class="stat-label" th:text="${averageLockTimeLabel}">averageLockTimeLabel</div>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value" th:text="${longestLockTimeMillis}">0ms</div>
+      <div class="stat-label" th:text="${longestLockTimeLabel}">longestLockTimeLabel</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" th:text="${maxRowsSent}">0</div>
+      <div class="stat-label" th:text="${maxRowsSentLabel}">maxRowsSentLabel</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" th:text="${maxRowsExamined}">0</div>
+      <div class="stat-label" th:text="${maxRowsExaminedLabel}">maxRowsExaminedLabel</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" th:text="${minRowsEfficiency}">0.00%</div>
+      <div class="stat-label" th:text="${minRowsEfficiencyLabel}">minRowsEfficiencyLabel</div>
+    </div>
+  </div>
+
+  <h2 th:text="${topSlowQueriesTableTitle}">topSlowQueriesTableTitle</h2>
+  <table>
+    <thead>
+    <tr>
+      <th th:text="${topSlowQueriesTableTimeLabel}">topSlowQueriesTableTimeLabel</th>
+      <th th:text="${topSlowQueriesTableDatabaseLabel}">topSlowQueriesTableDatabaseLabel</th>
+      <th th:text="${topSlowQueriesTableQueryTimeLabel}">topSlowQueriesTableQueryTimeLabel</th>
+      <th th:text="${topSlowQueriesTableRowsSentLabel}">topSlowQueriesTableRowsSentLabel</th>
+      <th th:text="${topSlowQueriesTableRowsExaminedLabel}">topSlowQueriesTableRowsExaminedLabel</th>
+      <th th:text="${topSlowQueriesTableSqlLabel}">topSlowQueriesTableSqlLabel</th>
+    </tr>
+    </thead>
+    <tbody id="top-slow-queries-list">
+    <tr th:each="query : ${topSlowQueries}">
+      <td th:text="${query.datetime}">datetime</td>
+      <td th:text="${query.database}" class="db-tag">database</td>
+      <td th:text="${query.queryTimeMillis}" class="query-time">queryTimeMillis</td>
+      <td th:text="${query.rowsSent}">rowsSent</td>
+      <td th:text="${query.rowsExamined}">rowsExamined</td>
+      <td th:text="${query.sql}"><code>sql</code></td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+
+</html>
