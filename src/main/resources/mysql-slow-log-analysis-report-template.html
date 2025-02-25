@@ -72,9 +72,7 @@
       border-collapse: collapse;
     }
 
-    th,
-    td {
-      width: 0;
+    th, td {
       padding: 12px 15px;
       text-align: left;
       border-bottom: 1px solid #ddd;
@@ -97,12 +95,12 @@
     }
 
     .db-tag {
-      display: inline-block;
-      padding: 4px 8px;
-      font-size: 0.8em;
-      border-radius: 4px;
-      color: white;
-      background: var(--success);
+      font-weight: bold;
+      color: var(--success);
+    }
+
+    .no-wrap {
+      white-space: nowrap;
     }
 
     @media (max-width: 768px) {
@@ -128,22 +126,22 @@
       <div class="stat-label" th:text="${totalSlowQueriesLabel}">totalSlowQueriesLabel</div>
     </div>
     <div class="stat-card">
-      <div class="stat-value" th:text="${averageQueryTimeMillis}">0ms</div>
+      <div class="stat-value" th:text="${averageQueryTimeMillis} + 'ms'">0ms</div>
       <div class="stat-label" th:text="${averageQueryTimeLabel}">averageQueryTimeLabel</div>
     </div>
     <div class="stat-card">
-      <div class="stat-value" th:text="${slowestQueryTimeMillis}">0ms</div>
+      <div class="stat-value" th:text="${slowestQueryTimeMillis} + 'ms'">0ms</div>
       <div class="stat-label" th:text="${slowestQueryTimeLabel}">slowestQueryTimeLabel</div>
     </div>
     <div class="stat-card">
-      <div class="stat-value" th:text="${averageLockTimeMillis}">0ms</div>
+      <div class="stat-value" th:text="${averageLockTimeMillis} + 'ms'">0ms</div>
       <div class="stat-label" th:text="${averageLockTimeLabel}">averageLockTimeLabel</div>
     </div>
   </div>
 
   <div class="stats-grid">
     <div class="stat-card">
-      <div class="stat-value" th:text="${longestLockTimeMillis}">0ms</div>
+      <div class="stat-value" th:text="${longestLockTimeMillis} + 'ms'">0ms</div>
       <div class="stat-label" th:text="${longestLockTimeLabel}">longestLockTimeLabel</div>
     </div>
     <div class="stat-card">
@@ -155,7 +153,7 @@
       <div class="stat-label" th:text="${maxRowsExaminedLabel}">maxRowsExaminedLabel</div>
     </div>
     <div class="stat-card">
-      <div class="stat-value" th:text="${minRowsEfficiency}">0.00%</div>
+      <div class="stat-value" th:text="${minRowsEfficiency} + '%'">0.00%</div>
       <div class="stat-label" th:text="${minRowsEfficiencyLabel}">minRowsEfficiencyLabel</div>
     </div>
   </div>
@@ -166,20 +164,20 @@
     <tr>
       <th th:text="${topSlowQueriesTableTimeLabel}">topSlowQueriesTableTimeLabel</th>
       <th th:text="${topSlowQueriesTableDatabaseLabel}">topSlowQueriesTableDatabaseLabel</th>
-      <th th:text="${topSlowQueriesTableQueryTimeLabel}">topSlowQueriesTableQueryTimeLabel</th>
-      <th th:text="${topSlowQueriesTableRowsSentLabel}">topSlowQueriesTableRowsSentLabel</th>
-      <th th:text="${topSlowQueriesTableRowsExaminedLabel}">topSlowQueriesTableRowsExaminedLabel</th>
+      <th class="no-wrap" th:text="${topSlowQueriesTableQueryTimeLabel}">topSlowQueriesTableQueryTimeLabel</th>
+      <th class="no-wrap" th:text="${topSlowQueriesTableRowsSentLabel}">topSlowQueriesTableRowsSentLabel</th>
+      <th class="no-wrap" th:text="${topSlowQueriesTableRowsExaminedLabel}">topSlowQueriesTableRowsExaminedLabel</th>
       <th th:text="${topSlowQueriesTableSqlLabel}">topSlowQueriesTableSqlLabel</th>
     </tr>
     </thead>
-    <tbody id="top-slow-queries-list">
+    <tbody>
     <tr th:each="query : ${topSlowQueries}">
-      <td th:text="${query.datetime}">datetime</td>
-      <td th:text="${query.database}" class="db-tag">database</td>
-      <td th:text="${query.queryTimeMillis}" class="query-time">queryTimeMillis</td>
+      <td class="no-wrap" th:text="${query.datetime}">datetime</td>
+      <td class="db-tag" th:text="${query.database}">database</td>
+      <td class="query-time" th:text="${query.queryTimeMillis} + 'ms'">queryTimeMillis</td>
       <td th:text="${query.rowsSent}">rowsSent</td>
       <td th:text="${query.rowsExamined}">rowsExamined</td>
-      <td th:text="${query.sql}"><code>sql</code></td>
+      <td th:text="${query.sql}">sql</td>
     </tr>
     </tbody>
   </table>
