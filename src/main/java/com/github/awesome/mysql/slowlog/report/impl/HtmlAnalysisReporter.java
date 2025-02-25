@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -47,7 +48,17 @@ public class HtmlAnalysisReporter implements AnalysisReporter {
         templateEngine.setTemplateResolver(templateResolver);
 
         Context context = new Context();
+        setNoLocaleVariables(context, result);
+        setLocaleVariables(context, i18n);
 
+        final String html = templateEngine.process(HtmlAnalysisReporter.HTML_TEMPLATE_NAME, context);
+        final String i18nSuffix = String.format("%s_%s", i18n.getLocale().getLanguage(), i18n.getLocale().getCountry());
+        final String reportName = HtmlAnalysisReporter.HTML_TEMPLATE_NAME.replace("template", i18nSuffix);
+
+        Files.write(Paths.get(config.getAnalysisReportPath(), reportName), html.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private void setNoLocaleVariables(Context context, AnalysisResult result) {
         context.setVariable("totalSlowQueries", result.getTotalSlowQueries());
         context.setVariable("averageQueryTimeMillis", result.getAverageQueryTimeMillis().toPlainString());
         context.setVariable("slowestQueryTimeMillis", result.getSlowestQuery().getQueryTimeMillis().toPlainString());
@@ -61,16 +72,16 @@ public class HtmlAnalysisReporter implements AnalysisReporter {
             .toPlainString()
         );
         context.setVariable("topSlowQueries", result.getTopSlowQueries());
+    }
 
+    private void setLocaleVariables(Context context, ResourceBundle i18n) {
         Set<String> i18nKeys = i18n.keySet();
         for (String key : i18nKeys) {
             context.setVariable(key, i18n.getString(key));
         }
-
-        final String html = templateEngine.process(HtmlAnalysisReporter.HTML_TEMPLATE_NAME, context);
-        final String i18nSuffix = String.format("%s_%s", i18n.getLocale().getLanguage(), i18n.getLocale().getCountry());
-        final String reportName = HtmlAnalysisReporter.HTML_TEMPLATE_NAME.replace("template", i18nSuffix);
-        Files.write(Paths.get(config.getAnalysisReportPath(), reportName), html.getBytes(StandardCharsets.UTF_8));
+        // parameterized messages
+        final String topSlowQueriesTableTitle = MessageFormat.format(i18n.getString("topSlowQueriesTableTitle"), config.getTopSlowQueries());
+        context.setVariable("topSlowQueriesTableTitle", topSlowQueriesTableTitle);
     }
 
 }
