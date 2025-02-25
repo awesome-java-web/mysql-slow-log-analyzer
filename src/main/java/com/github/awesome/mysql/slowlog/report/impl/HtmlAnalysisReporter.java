@@ -29,15 +29,11 @@ public class HtmlAnalysisReporter implements AnalysisReporter {
     private final Config config;
 
     @Override
-    public void report(AnalysisResult result) {
+    public void report(AnalysisResult result) throws IOException {
         ResourceBundle i18nChinese = ResourceBundle.getBundle(I18N_BASE_NAME, Locale.CHINA);
         ResourceBundle i18nEnglish = ResourceBundle.getBundle(I18N_BASE_NAME, Locale.US);
-        try {
-            renderHtml(result, i18nChinese);
-            renderHtml(result, i18nEnglish);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        renderHtml(result, i18nChinese);
+        renderHtml(result, i18nEnglish);
     }
 
     private void renderHtml(AnalysisResult result, ResourceBundle i18n) throws IOException {
