@@ -66,10 +66,11 @@ public class HtmlAnalysisReporter implements AnalysisReporter {
         context.setVariable("longestLockTimeMillis", result.getLongestLockTimeQuery().getLockTimeMillis().toPlainString());
         context.setVariable("maxRowsSent", result.getMaxRowsSentQuery().getRowsSent());
         context.setVariable("maxRowsExamined", result.getMaxRowsExaminedQuery().getRowsExamined());
-        context.setVariable("minRowsEfficiency", result.getMinRowsEfficiencyQuery()
-            .getRowsEfficiency()
-            .movePointRight(2)
-            .toPlainString()
+        context.setVariable("minRowsEfficiency",
+            String.format("%d/%d",
+                result.getMinRowsEfficiencyQuery().getRowsSent(),
+                result.getMinRowsEfficiencyQuery().getRowsExamined()
+            )
         );
         context.setVariable("topSlowQueries", result.getTopSlowQueries());
     }
