@@ -6,7 +6,6 @@ import com.github.awesome.mysql.slowlog.parser.model.AnalyzableLogEntry;
 import lombok.AllArgsConstructor;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -19,8 +18,6 @@ public class QueryAnalyzer {
     public AnalysisResult analyze(List<AnalyzableLogEntry> entries) {
         AnalysisResult result = new AnalysisResult();
         result.setTotalSlowQueries(entries.size());
-        result.setAverageQueryTimeMillis(calculateAverageQueryTimeMillis(entries));
-        result.setAverageLockTimeMillis(calculateAverageLockTimeMillis(entries));
         result.setSlowestQuery(findSlowestQuery(entries));
         result.setLongestLockTimeQuery(findLongestLockTimeQuery(entries));
         result.setMaxRowsSentQuery(findMaxRowsSentQuery(entries));
@@ -32,22 +29,6 @@ public class QueryAnalyzer {
         result.setTopRowsExaminedQueries(findTopRowsExaminedQueries(entries));
         result.setTopWorstRowsEfficiencyQueries(findTopWorstRowsEfficiencyQueries(entries));
         return result;
-    }
-
-    private BigDecimal calculateAverageQueryTimeMillis(List<AnalyzableLogEntry> entries) {
-        BigDecimal totalQueryTime = BigDecimal.ZERO;
-        for (AnalyzableLogEntry entry : entries) {
-            totalQueryTime = totalQueryTime.add(entry.getQueryTimeMillis());
-        }
-        return totalQueryTime.divide(new BigDecimal(entries.size()), 3, RoundingMode.HALF_UP);
-    }
-
-    private BigDecimal calculateAverageLockTimeMillis(List<AnalyzableLogEntry> entries) {
-        BigDecimal totalLockTime = BigDecimal.ZERO;
-        for (AnalyzableLogEntry entry : entries) {
-            totalLockTime = totalLockTime.add(entry.getLockTimeMillis());
-        }
-        return totalLockTime.divide(new BigDecimal(entries.size()), 3, RoundingMode.HALF_UP);
     }
 
     private AnalyzableLogEntry findSlowestQuery(List<AnalyzableLogEntry> entries) {

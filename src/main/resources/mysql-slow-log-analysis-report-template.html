@@ -123,38 +123,27 @@
   <div class="stats-grid">
     <div class="stat-card">
       <div class="stat-value" th:text="${totalSlowQueries}">0</div>
-      <div class="stat-label" th:text="${totalSlowQueriesLabel}">totalSlowQueriesLabel</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" th:text="${averageQueryTimeMillis} + 'ms'">0ms</div>
-      <div class="stat-label" th:text="${averageQueryTimeLabel}">averageQueryTimeLabel</div>
+      <div class="stat-label" th:text="${totalSlowQueriesText}">Total Slow Queries</div>
     </div>
     <div class="stat-card">
       <div class="stat-value" th:text="${slowestQueryTimeMillis} + 'ms'">0ms</div>
-      <div class="stat-label" th:text="${slowestQueryTimeLabel}">slowestQueryTimeLabel</div>
+      <div class="stat-label" th:text="${slowestQueryTimeText}">Slowest Query Time</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-value" th:text="${averageLockTimeMillis} + 'ms'">0ms</div>
-      <div class="stat-label" th:text="${averageLockTimeLabel}">averageLockTimeLabel</div>
-    </div>
-  </div>
-
-  <div class="stats-grid">
     <div class="stat-card">
       <div class="stat-value" th:text="${longestLockTimeMillis} + 'ms'">0ms</div>
-      <div class="stat-label" th:text="${longestLockTimeLabel}">longestLockTimeLabel</div>
+      <div class="stat-label" th:text="${longestLockTimeText}">Longest Lock Time</div>
     </div>
     <div class="stat-card">
       <div class="stat-value" th:text="${maxRowsSent}">0</div>
-      <div class="stat-label" th:text="${maxRowsSentLabel}">maxRowsSentLabel</div>
+      <div class="stat-label" th:text="${maxRowsSentText}">Max Rows Sent</div>
     </div>
     <div class="stat-card">
       <div class="stat-value" th:text="${maxRowsExamined}">0</div>
-      <div class="stat-label" th:text="${maxRowsExaminedLabel}">maxRowsExaminedLabel</div>
+      <div class="stat-label" th:text="${maxRowsExaminedText}">Max Rows Examined</div>
     </div>
     <div class="stat-card">
       <div class="stat-value" th:text="${minRowsEfficiency}">1/100</div>
-      <div class="stat-label" th:text="${minRowsEfficiencyLabel}">minRowsEfficiencyLabel</div>
+      <div class="stat-label" th:text="${minRowsEfficiencyText}">Min Rows Efficiency</div>
     </div>
   </div>
 
