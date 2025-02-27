@@ -72,7 +72,8 @@
       border-collapse: collapse;
     }
 
-    th, td {
+    th,
+    td {
       padding: 12px 15px;
       text-align: left;
       border-bottom: 1px solid #ddd;
@@ -117,60 +118,60 @@
 </head>
 
 <body>
-<div class="container">
-  <h1 th:text="${title}">Default Title</h1>
+  <div class="container">
+    <h1 th:text="${title}">Default Title</h1>
 
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-value" th:text="${totalSlowQueries}">0</div>
-      <div class="stat-label" th:text="${totalSlowQueriesText}">Total Slow Queries</div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" th:text="${totalSlowQueries}">0</div>
+        <div class="stat-label" th:text="${totalSlowQueriesText}">Total Slow Queries</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" th:text="${slowestQueryTimeMillis} + 'ms'">0ms</div>
+        <div class="stat-label" th:text="${slowestQueryTimeText}">Slowest Query Time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" th:text="${longestLockTimeMillis} + 'ms'">0ms</div>
+        <div class="stat-label" th:text="${longestLockTimeText}">Longest Lock Time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" th:text="${maxRowsSent}">0</div>
+        <div class="stat-label" th:text="${maxRowsSentText}">Max Rows Sent</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" th:text="${maxRowsExamined}">0</div>
+        <div class="stat-label" th:text="${maxRowsExaminedText}">Max Rows Examined</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" th:text="${worstRowsEfficiency}">1/100</div>
+        <div class="stat-label" th:text="${worstRowsEfficiencyText}">Worst Rows Efficiency</div>
+      </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-value" th:text="${slowestQueryTimeMillis} + 'ms'">0ms</div>
-      <div class="stat-label" th:text="${slowestQueryTimeText}">Slowest Query Time</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" th:text="${longestLockTimeMillis} + 'ms'">0ms</div>
-      <div class="stat-label" th:text="${longestLockTimeText}">Longest Lock Time</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" th:text="${maxRowsSent}">0</div>
-      <div class="stat-label" th:text="${maxRowsSentText}">Max Rows Sent</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" th:text="${maxRowsExamined}">0</div>
-      <div class="stat-label" th:text="${maxRowsExaminedText}">Max Rows Examined</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" th:text="${worstRowsEfficiency}">1/100</div>
-      <div class="stat-label" th:text="${worstRowsEfficiencyText}">Worst Rows Efficiency</div>
-    </div>
+
+    <h2 th:text="${topSlowQueriesTableTitle}">Top N Slow Queries</h2>
+    <table>
+      <thead>
+        <tr>
+          <th th:text="${tableHeaderTimeText}">Time</th>
+          <th th:text="${tableHeaderDatabaseText}">Database</th>
+          <th class="no-wrap" th:text="${tableHeaderQueryTimeText}">Query Time</th>
+          <th class="no-wrap" th:text="${tableHeaderRowsSentText}">Rows Sent</th>
+          <th class="no-wrap" th:text="${tableHeaderRowsExaminedText}">Rows Examined</th>
+          <th th:text="${tableHeaderSqlText}">SQL</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="query : ${topSlowQueries}">
+          <td class="no-wrap" th:text="${query.datetime}">datetime</td>
+          <td class="db-tag" th:text="${query.database}">database</td>
+          <td class="query-time" th:text="${query.queryTimeMillis} + 'ms'">queryTimeMillis</td>
+          <td th:text="${query.rowsSent}">rowsSent</td>
+          <td th:text="${query.rowsExamined}">rowsExamined</td>
+          <td th:text="${query.sql}">sql</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-
-  <h2 th:text="${topSlowQueriesTableTitle}">topSlowQueriesTableTitle</h2>
-  <table>
-    <thead>
-    <tr>
-      <th th:text="${topSlowQueriesTableTimeLabel}">topSlowQueriesTableTimeLabel</th>
-      <th th:text="${topSlowQueriesTableDatabaseLabel}">topSlowQueriesTableDatabaseLabel</th>
-      <th class="no-wrap" th:text="${topSlowQueriesTableQueryTimeLabel}">topSlowQueriesTableQueryTimeLabel</th>
-      <th class="no-wrap" th:text="${topSlowQueriesTableRowsSentLabel}">topSlowQueriesTableRowsSentLabel</th>
-      <th class="no-wrap" th:text="${topSlowQueriesTableRowsExaminedLabel}">topSlowQueriesTableRowsExaminedLabel</th>
-      <th th:text="${topSlowQueriesTableSqlLabel}">topSlowQueriesTableSqlLabel</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="query : ${topSlowQueries}">
-      <td class="no-wrap" th:text="${query.datetime}">datetime</td>
-      <td class="db-tag" th:text="${query.database}">database</td>
-      <td class="query-time" th:text="${query.queryTimeMillis} + 'ms'">queryTimeMillis</td>
-      <td th:text="${query.rowsSent}">rowsSent</td>
-      <td th:text="${query.rowsExamined}">rowsExamined</td>
-      <td th:text="${query.sql}">sql</td>
-    </tr>
-    </tbody>
-  </table>
-</div>
 </body>
 
 </html>
