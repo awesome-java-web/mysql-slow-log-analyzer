@@ -95,6 +95,11 @@
       color: var(--danger);
     }
 
+    .lock-time {
+      font-weight: bold;
+      color: var(--secondary);
+    }
+
     .db-tag {
       font-weight: bold;
       color: var(--success);
@@ -155,6 +160,7 @@
           <th th:text="${tableHeaderTimeText}">Time</th>
           <th th:text="${tableHeaderDatabaseText}">Database</th>
           <th class="no-wrap" th:text="${tableHeaderQueryTimeText}">Query Time</th>
+          <th class="no-wrap" th:text="${tableHeaderLockTimeText}">Lock Time</th>
           <th class="no-wrap" th:text="${tableHeaderRowsSentText}">Rows Sent</th>
           <th class="no-wrap" th:text="${tableHeaderRowsExaminedText}">Rows Examined</th>
           <th th:text="${tableHeaderSqlText}">SQL</th>
@@ -165,6 +171,7 @@
           <td class="no-wrap" th:text="${query.datetime}">datetime</td>
           <td class="db-tag" th:text="${query.database}">database</td>
           <td class="query-time" th:text="${query.queryTimeMillis} + 'ms'">queryTimeMillis</td>
+          <td class="lock-time" th:text="${query.lockTimeMillis} + 'ms'">lockTimeMillis</td>
           <td th:text="${query.rowsSent}">rowsSent</td>
           <td th:text="${query.rowsExamined}">rowsExamined</td>
           <td th:text="${query.sql}">sql</td>
