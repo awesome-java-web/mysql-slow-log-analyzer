@@ -23,7 +23,7 @@ public class AnalysisResult implements Serializable {
 
     private AnalyzableLogEntry maxRowsExaminedQuery;
 
-    private AnalyzableLogEntry minRowsEfficiencyQuery;
+    private AnalyzableLogEntry worstRowsEfficiencyQuery;
 
     private List<AnalyzableLogEntry> topSlowQueries;
 

@@ -22,7 +22,7 @@ public class QueryAnalyzer {
         result.setLongestLockTimeQuery(findLongestLockTimeQuery(entries));
         result.setMaxRowsSentQuery(findMaxRowsSentQuery(entries));
         result.setMaxRowsExaminedQuery(findMaxRowsExaminedQuery(entries));
-        result.setMinRowsEfficiencyQuery(findMinRowsEfficiencyQuery(entries));
+        result.setWorstRowsEfficiencyQuery(findWorstRowsEfficiencyQuery(entries));
         result.setTopSlowQueries(findTopSlowQueries(entries));
         result.setTopLockTimeQueries(findTopLockTimeQueries(entries));
         result.setTopRowsSentQueries(findTopRowsSentQueries(entries));
@@ -79,16 +79,16 @@ public class QueryAnalyzer {
         return maxRowsExaminedQuery;
     }
 
-    private AnalyzableLogEntry findMinRowsEfficiencyQuery(List<AnalyzableLogEntry> entries) {
-        BigDecimal minRowsEfficiency = BigDecimal.ONE;
-        AnalyzableLogEntry minRowsEfficiencyQuery = null;
+    private AnalyzableLogEntry findWorstRowsEfficiencyQuery(List<AnalyzableLogEntry> entries) {
+        BigDecimal worstRowsEfficiency = BigDecimal.ONE;
+        AnalyzableLogEntry worstRowsEfficiencyQuery = null;
         for (AnalyzableLogEntry entry : entries) {
-            if (entry.getRowsEfficiency().compareTo(minRowsEfficiency) < 0) {
-                minRowsEfficiency = entry.getRowsEfficiency();
-                minRowsEfficiencyQuery = entry;
+            if (entry.getRowsEfficiency().compareTo(worstRowsEfficiency) < 0) {
+                worstRowsEfficiency = entry.getRowsEfficiency();
+                worstRowsEfficiencyQuery = entry;
             }
         }
-        return minRowsEfficiencyQuery;
+        return worstRowsEfficiencyQuery;
     }
 
     private List<AnalyzableLogEntry> findTopSlowQueries(List<AnalyzableLogEntry> entries) {

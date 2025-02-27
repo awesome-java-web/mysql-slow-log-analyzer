@@ -42,7 +42,7 @@ class LocalFileLogReaderTest {
         assertEquals(2144, analysisResult.getMaxRowsExaminedQuery().getRowsExamined());
         assertEquals(
             BigDecimal.valueOf(1).divide(BigDecimal.valueOf(2084), AnalyzableLogEntry.DEFAULT_BIG_DECIMAL_SCALE, RoundingMode.HALF_UP),
-            analysisResult.getMinRowsEfficiencyQuery().getRowsEfficiency()
+            analysisResult.getWorstRowsEfficiencyQuery().getRowsEfficiency()
         );
     }
 
