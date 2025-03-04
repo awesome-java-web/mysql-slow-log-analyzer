@@ -22,12 +22,7 @@ public class QueryAnalyzer {
         result.setLongestLockTimeQuery(findLongestLockTimeQuery(entries));
         result.setMaxRowsSentQuery(findMaxRowsSentQuery(entries));
         result.setMaxRowsExaminedQuery(findMaxRowsExaminedQuery(entries));
-        result.setWorstRowsEfficiencyQuery(findWorstRowsEfficiencyQuery(entries));
         result.setTopSlowQueries(findTopSlowQueries(entries));
-        result.setTopLockTimeQueries(findTopLockTimeQueries(entries));
-        result.setTopRowsSentQueries(findTopRowsSentQueries(entries));
-        result.setTopRowsExaminedQueries(findTopRowsExaminedQueries(entries));
-        result.setTopWorstRowsEfficiencyQueries(findTopWorstRowsEfficiencyQueries(entries));
         return result;
     }
 
@@ -79,53 +74,10 @@ public class QueryAnalyzer {
         return maxRowsExaminedQuery;
     }
 
-    private AnalyzableLogEntry findWorstRowsEfficiencyQuery(List<AnalyzableLogEntry> entries) {
-        BigDecimal worstRowsEfficiency = BigDecimal.ONE;
-        AnalyzableLogEntry worstRowsEfficiencyQuery = null;
-        for (AnalyzableLogEntry entry : entries) {
-            if (entry.getRowsEfficiency().compareTo(worstRowsEfficiency) < 0) {
-                worstRowsEfficiency = entry.getRowsEfficiency();
-                worstRowsEfficiencyQuery = entry;
-            }
-        }
-        return worstRowsEfficiencyQuery;
-    }
-
     private List<AnalyzableLogEntry> findTopSlowQueries(List<AnalyzableLogEntry> entries) {
         return entries.stream()
             .sorted((e1, e2) -> e2.getQueryTimeMillis().compareTo(e1.getQueryTimeMillis()))
             .limit(config.getTopSlowQueries())
-            .collect(toList());
-    }
-
-    private List<AnalyzableLogEntry> findTopLockTimeQueries(List<AnalyzableLogEntry> entries) {
-        return entries.stream()
-            .sorted((e1, e2) -> e2.getLockTimeMillis().compareTo(e1.getLockTimeMillis()))
-            .limit(config.getTopLockTimeQueries())
-            .collect(toList());
-    }
-
-    private List<AnalyzableLogEntry> findTopRowsSentQueries(List<AnalyzableLogEntry> entries) {
-        return entries.stream()
-            .sorted((e1, e2) -> Long.compare(e2.getRowsSent(), e1.getRowsSent()))
-            .limit(config.getTopRowsSentQueries())
-            .collect(toList());
-    }
-
-    private List<AnalyzableLogEntry> findTopRowsExaminedQueries(List<AnalyzableLogEntry> entries) {
-        return entries.stream()
-            .sorted((e1, e2) -> Long.compare(e2.getRowsExamined(), e1.getRowsExamined()))
-            .limit(config.getTopRowsExaminedQueries())
-            .collect(toList());
-    }
-
-    private List<AnalyzableLogEntry> findTopWorstRowsEfficiencyQueries(List<AnalyzableLogEntry> entries) {
-        return entries.stream()
-            .sorted((e1, e2) -> {
-                final int compareResult = e1.getRowsEfficiency().compareTo(e2.getRowsEfficiency());
-                return compareResult == 0 ? Long.compare(e2.getRowsExamined(), e1.getRowsExamined()) : compareResult;
-            })
-            .limit(config.getTopWorstRowsEfficiencyQueries())
             .collect(toList());
     }
 

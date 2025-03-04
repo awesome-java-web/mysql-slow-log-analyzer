@@ -23,15 +23,5 @@ public class AnalysisResult implements Serializable {
 
     private AnalyzableLogEntry maxRowsExaminedQuery;
 
-    private AnalyzableLogEntry worstRowsEfficiencyQuery;
-
     private List<AnalyzableLogEntry> topSlowQueries;
-
-    private List<AnalyzableLogEntry> topLockTimeQueries;
-
-    private List<AnalyzableLogEntry> topRowsSentQueries;
-
-    private List<AnalyzableLogEntry> topRowsExaminedQueries;
-
-    private List<AnalyzableLogEntry> topWorstRowsEfficiencyQueries;
 }

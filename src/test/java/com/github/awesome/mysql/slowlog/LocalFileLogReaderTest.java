@@ -14,8 +14,6 @@ import com.github.awesome.mysql.slowlog.report.impl.HtmlAnalysisReporter;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -35,15 +33,11 @@ class LocalFileLogReaderTest {
         AnalysisResult analysisResult = queryAnalyzer.analyze(analyzableLogEntries);
         AnalysisReporter htmlAnalysisReporter = new HtmlAnalysisReporter(config);
         htmlAnalysisReporter.report(analysisResult);
-        assertEquals(3, analyzableLogEntries.size());
-        assertEquals("909.278", analysisResult.getSlowestQuery().getQueryTimeMillis().toPlainString());
-        assertEquals("0.122", analysisResult.getLongestLockTimeQuery().getLockTimeMillis().toPlainString());
-        assertEquals(2144, analysisResult.getMaxRowsSentQuery().getRowsSent());
-        assertEquals(2144, analysisResult.getMaxRowsExaminedQuery().getRowsExamined());
-        assertEquals(
-            BigDecimal.valueOf(1).divide(BigDecimal.valueOf(2084), AnalyzableLogEntry.DEFAULT_BIG_DECIMAL_SCALE, RoundingMode.HALF_UP),
-            analysisResult.getWorstRowsEfficiencyQuery().getRowsEfficiency()
-        );
+        assertEquals(4277, analyzableLogEntries.size());
+        assertEquals("33185.268", analysisResult.getSlowestQuery().getQueryTimeMillis().toPlainString());
+        assertEquals("2.632", analysisResult.getLongestLockTimeQuery().getLockTimeMillis().toPlainString());
+        assertEquals(12438, analysisResult.getMaxRowsSentQuery().getRowsSent());
+        assertEquals(981484, analysisResult.getMaxRowsExaminedQuery().getRowsExamined());
     }
 
 }
