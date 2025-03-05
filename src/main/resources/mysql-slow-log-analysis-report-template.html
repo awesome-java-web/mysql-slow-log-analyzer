@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title th:text="${title}">Default Title</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     :root {
       --primary: #2c3e50;
@@ -57,6 +58,7 @@
       border-left: 4px solid var(--secondary);
       transition: all 0.3s ease;
       transform: translateY(0);
+      cursor: pointer;
     }
 
     .stat-card:hover {
@@ -153,20 +155,20 @@
         <div class="stat-value" th:text="${totalSlowQueries}">0</div>
         <div class="stat-label" th:text="${totalSlowQueriesText}">Total Slow Queries</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-value" th:text="${slowestQueryTimeMillis} + 'ms'">0ms</div>
+      <div class="stat-card" th:data-sql="${slowestQuery.sql}">
+        <div class="stat-value" th:text="${slowestQuery.queryTimeMillis} + 'ms'">0ms</div>
         <div class="stat-label" th:text="${slowestQueryTimeText}">Slowest Query Time</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-value" th:text="${longestLockTimeMillis} + 'ms'">0ms</div>
+      <div class="stat-card" th:data-sql="${longestLockTimeQuery.sql}">
+        <div class="stat-value" th:text="${longestLockTimeQuery.lockTimeMillis} + 'ms'">0ms</div>
         <div class="stat-label" th:text="${longestLockTimeText}">Longest Lock Time</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-value" th:text="${maxRowsSent}">0</div>
+      <div class="stat-card" th:data-sql="${maxRowsSentQuery.sql}">
+        <div class="stat-value" th:text="${maxRowsSentQuery.rowsSent}">0</div>
         <div class="stat-label" th:text="${maxRowsSentText}">Max Rows Sent</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-value" th:text="${maxRowsExamined}">0</div>
+      <div class="stat-card" th:data-sql="${maxRowsExaminedQuery.sql}">
+        <div class="stat-value" th:text="${maxRowsExaminedQuery.rowsExamined}">0</div>
         <div class="stat-label" th:text="${maxRowsExaminedText}">Max Rows Examined</div>
       </div>
     </div>
@@ -197,6 +199,28 @@
       </tbody>
     </table>
   </div>
+
+  <script>
+    document.querySelectorAll('.stat-card').forEach(card => {
+      card.addEventListener('click', function () {
+        const sql = this.getAttribute('data-sql');
+        if (sql) {
+          Swal.fire({
+            title: 'SQL Query',
+            html: `<pre style="text-align: left; white-space: pre-wrap; word-wrap: break-word;">${sql}</pre>`,
+            width: '80%',
+            confirmButtonText: 'Close',
+            confirmButtonColor: '#3498db',
+            customClass: {
+              container: 'swal-container',
+              popup: 'swal-popup',
+              content: 'swal-content'
+            }
+          });
+        }
+      });
+    });
+  </script>
 </body>
 
 </html>

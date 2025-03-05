@@ -56,10 +56,10 @@ public class HtmlAnalysisReporter implements AnalysisReporter {
 
     private void setNoLocaleVariables(Context context, AnalysisResult result) {
         context.setVariable("totalSlowQueries", result.getTotalSlowQueries());
-        context.setVariable("slowestQueryTimeMillis", result.getSlowestQuery().getQueryTimeMillis().toPlainString());
-        context.setVariable("longestLockTimeMillis", result.getLongestLockTimeQuery().getLockTimeMillis().toPlainString());
-        context.setVariable("maxRowsSent", result.getMaxRowsSentQuery().getRowsSent());
-        context.setVariable("maxRowsExamined", result.getMaxRowsExaminedQuery().getRowsExamined());
+        context.setVariable("slowestQuery", result.getSlowestQuery());
+        context.setVariable("longestLockTimeQuery", result.getLongestLockTimeQuery());
+        context.setVariable("maxRowsSentQuery", result.getMaxRowsSentQuery());
+        context.setVariable("maxRowsExaminedQuery", result.getMaxRowsExaminedQuery());
         context.setVariable("topSlowQueries", result.getTopSlowQueries());
     }
 
