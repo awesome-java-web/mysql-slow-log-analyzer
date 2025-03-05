@@ -26,10 +26,6 @@ public class ConfigLoader {
         config.setAnalysisReportPath("target/");
         config.setSlowQueryThreshold(500);
         config.setTopSlowQueries(10);
-        config.setTopLockTimeQueries(10);
-        config.setTopRowsSentQueries(10);
-        config.setTopRowsExaminedQueries(10);
-        config.setTopWorstRowsEfficiencyQueries(10);
         return config;
     }
 

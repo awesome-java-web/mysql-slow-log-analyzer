@@ -23,17 +23,4 @@ public class Config implements Serializable {
 
     @JsonProperty("top-slow-queries")
     private int topSlowQueries;
-
-    @JsonProperty("top-lock-time-queries")
-    private int topLockTimeQueries;
-
-    @JsonProperty("top-rows-sent-queries")
-    private int topRowsSentQueries;
-
-    @JsonProperty("top-rows-examined-queries")
-    private int topRowsExaminedQueries;
-
-    @JsonProperty("top-worst-rows-efficiency-queries")
-    private int topWorstRowsEfficiencyQueries;
-
 }
