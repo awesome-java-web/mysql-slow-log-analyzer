@@ -111,6 +111,31 @@
       top: 0;
       color: white;
       background: var(--primary);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    th:hover {
+      background: #3a506b;
+    }
+
+    th::after {
+      content: '';
+      display: inline-block;
+      width: 0;
+      height: 0;
+      margin-left: 8px;
+      vertical-align: middle;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+    }
+
+    th.asc::after {
+      border-bottom: 4px solid white;
+    }
+
+    th.desc::after {
+      border-top: 4px solid white;
     }
 
     tr:hover {
@@ -240,16 +265,16 @@
     </div>
 
     <h2 th:text="${topSlowQueriesTableTitle}">Top N Slow Queries</h2>
-    <table>
+    <table id="top-slow-queries-table">
       <thead>
         <tr>
-          <th th:text="${tableHeaderTimeText}">Time</th>
-          <th th:text="${tableHeaderDatabaseText}">Database</th>
-          <th class="no-wrap" th:text="${tableHeaderQueryTimeText}">Query Time</th>
-          <th class="no-wrap" th:text="${tableHeaderLockTimeText}">Lock Time</th>
-          <th class="no-wrap" th:text="${tableHeaderRowsSentText}">Rows Sent</th>
-          <th class="no-wrap" th:text="${tableHeaderRowsExaminedText}">Rows Examined</th>
-          <th class="no-wrap" th:text="${tableHeaderTotalHitCountText}">Total Hit Count</th>
+          <th th:text="${tableHeaderTimeText}" data-sort="datetime">Time</th>
+          <th th:text="${tableHeaderDatabaseText}" data-sort="database">Database</th>
+          <th class="no-wrap" th:text="${tableHeaderQueryTimeText}" data-sort="queryTimeMillis">Query Time</th>
+          <th class="no-wrap" th:text="${tableHeaderLockTimeText}" data-sort="lockTimeMillis">Lock Time</th>
+          <th class="no-wrap" th:text="${tableHeaderRowsSentText}" data-sort="rowsSent">Rows Sent</th>
+          <th class="no-wrap" th:text="${tableHeaderRowsExaminedText}" data-sort="rowsExamined">Rows Examined</th>
+          <th class="no-wrap" th:text="${tableHeaderTotalHitCountText}" data-sort="totalHitCount">Total Hit Count</th>
           <th th:text="${tableHeaderSqlText}">SQL</th>
         </tr>
       </thead>
@@ -276,7 +301,76 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       hljs.highlightAll();
+      initTableSort();
     });
+
+    function initTableSort() {
+      const table = document.getElementById('top-slow-queries-table');
+      const headers = table.querySelectorAll('th');
+      let currentSortColumn = null;
+      let currentSortOrder = 'asc';
+
+      headers.forEach(header => {
+        header.addEventListener('click', () => {
+          const sortKey = header.getAttribute('data-sort');
+          if (!sortKey) return;
+
+          // Remove sort indicators from all headers
+          headers.forEach(h => h.classList.remove('asc', 'desc'));
+
+          // Toggle sort order if clicking the same column
+          if (currentSortColumn === sortKey) {
+            currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+          } else {
+            currentSortColumn = sortKey;
+            currentSortOrder = 'asc';
+          }
+
+          // Add sort indicator to current header
+          header.classList.add(currentSortOrder);
+
+          const tbody = table.querySelector('tbody');
+          const rows = Array.from(tbody.querySelectorAll('tr'));
+
+          rows.sort((row, anotherRow) => {
+            let rowValue = getCellValue(row, sortKey);
+            let anotherRowValue = getCellValue(anotherRow, sortKey);
+
+            // Convert to numbers for numeric columns
+            if (['queryTimeMillis', 'lockTimeMillis', 'rowsSent', 'rowsExamined', 'totalHitCount'].includes(sortKey)) {
+              rowValue = parseFloat(rowValue);
+              anotherRowValue = parseFloat(anotherRowValue);
+            }
+
+            if (rowValue === anotherRowValue) return 0;
+            if (currentSortOrder === 'asc') {
+              return rowValue > anotherRowValue ? 1 : -1;
+            } else {
+              return rowValue < anotherRowValue ? 1 : -1;
+            }
+          });
+
+          // Reorder the rows
+          tbody.innerHTML = '';
+          rows.forEach(row => tbody.appendChild(row));
+        });
+      });
+    }
+
+    function getCellValue(row, key) {
+      const rowCells = Array.from(row.parentNode.querySelector('tr').cells);
+      const cellIndex = rowCells.findIndex(cell => cell.closest('table').querySelector(`th[data-sort="${key}"]`).cellIndex === cell.cellIndex);
+
+      const cell = row.cells[cellIndex];
+      let value = cell.textContent.trim();
+
+      // Remove 'ms' suffix for time values
+      if (key === 'queryTimeMillis' || key === 'lockTimeMillis') {
+        value = value.replace('ms', '');
+      }
+
+      return value;
+    }
 
     const clipboard = new ClipboardJS('.copy-button');
     clipboard.on('success', function (e) {
