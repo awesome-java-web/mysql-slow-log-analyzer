@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/atom-one-dark.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/languages/sql.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     :root {
@@ -148,6 +149,7 @@
 
     pre code.hljs {
       padding: 1em;
+      text-align: left;
       border-radius: 6px;
       font-size: 14px;
       white-space: pre-wrap !important;
@@ -174,6 +176,42 @@
       white-space: pre-wrap !important;
       word-wrap: break-word !important;
       overflow: visible !important;
+    }
+
+    .code-container {
+      position: relative;
+      margin: 0;
+    }
+
+    .copy-button {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      padding: 4px 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      opacity: 0;
+    }
+
+    .code-container:hover .copy-button {
+      opacity: 1;
+    }
+
+    .copy-button:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .copy-button.copied {
+      background: #27ae60;
+    }
+
+    pre code.hljs {
+      padding-right: 50px;
     }
   </style>
 </head>
@@ -227,7 +265,10 @@
           <td th:text="${query.rowsSent}">rowsSent</td>
           <td th:text="${query.rowsExamined}">rowsExamined</td>
           <td>
-            <pre><code class="hljs" th:text="${query.sql}">sql</code></pre>
+            <div class="code-container">
+              <pre><code class="sql" th:text="${query.sql}">sql</code></pre>
+              <button class="copy-button" data-clipboard-text="${query.sql}">Copy</button>
+            </div>
           </td>
         </tr>
       </tbody>
@@ -235,26 +276,52 @@
   </div>
 
   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      hljs.highlightAll();
+    });
+
+    const clipboard = new ClipboardJS('.copy-button');
+    clipboard.on('success', function (e) {
+      const button = e.trigger;
+      button.textContent = 'Copied!';
+      button.classList.add('copied');
+
+      setTimeout(() => {
+        button.textContent = 'Copy';
+        button.classList.remove('copied');
+      }, 2000);
+
+      e.clearSelection();
+    });
+
     document.querySelectorAll('.stat-card').forEach(card => {
       card.addEventListener('click', function () {
         const sql = this.getAttribute('data-sql');
         if (sql) {
           Swal.fire({
             title: 'SQL Query',
-            html: `<pre><code class="hljs" style="text-align: left; white-space: pre-wrap; word-wrap: break-word;">${sql}</code></pre>`,
+            html: `
+              <div class="code-container">
+                <pre><code class="hljs">${sql}</code></pre>
+                <button class="copy-button" data-clipboard-text="${sql}">Copy</button>
+              </div>
+            `,
             width: '80%',
             confirmButtonText: 'Close',
             confirmButtonColor: '#3498db',
+            customClass: {
+              container: 'swal2-container',
+              popup: 'swal2-popup',
+              content: 'swal2-content',
+              htmlContainer: 'swal2-html-container'
+            },
             didOpen: () => {
               document.querySelectorAll('.swal2-content pre code').forEach(block => hljs.highlightElement(block));
+              new ClipboardJS('.swal2-content .copy-button');
             }
           });
         }
       });
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-      hljs.highlightAll();
     });
   </script>
 </body>
