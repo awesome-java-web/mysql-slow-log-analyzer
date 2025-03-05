@@ -253,6 +253,7 @@
           <th class="no-wrap" th:text="${tableHeaderLockTimeText}">Lock Time</th>
           <th class="no-wrap" th:text="${tableHeaderRowsSentText}">Rows Sent</th>
           <th class="no-wrap" th:text="${tableHeaderRowsExaminedText}">Rows Examined</th>
+          <th class="no-wrap" th:text="${tableHeaderTotalHitCountText}">Total Hit Count</th>
           <th th:text="${tableHeaderSqlText}">SQL</th>
         </tr>
       </thead>
@@ -264,6 +265,7 @@
           <td class="lock-time" th:text="${query.lockTimeMillis} + 'ms'">lockTimeMillis</td>
           <td th:text="${query.rowsSent}">rowsSent</td>
           <td th:text="${query.rowsExamined}">rowsExamined</td>
+          <td th:text="${totalHitCountMap.get(query.identifier)}">totalHitCount</td>
           <td>
             <div class="code-container">
               <pre><code class="sql" th:text="${query.sql}">sql</code></pre>

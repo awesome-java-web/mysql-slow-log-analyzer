@@ -7,6 +7,7 @@ import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -24,4 +25,6 @@ public class AnalysisResult implements Serializable {
     private AnalyzableLogEntry maxRowsExaminedQuery;
 
     private List<AnalyzableLogEntry> topSlowQueries;
+
+    private Map<String, Long> totalHitCountMap;
 }

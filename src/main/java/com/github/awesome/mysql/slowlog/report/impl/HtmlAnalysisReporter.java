@@ -61,6 +61,7 @@ public class HtmlAnalysisReporter implements AnalysisReporter {
         context.setVariable("maxRowsSentQuery", result.getMaxRowsSentQuery());
         context.setVariable("maxRowsExaminedQuery", result.getMaxRowsExaminedQuery());
         context.setVariable("topSlowQueries", result.getTopSlowQueries());
+        context.setVariable("totalHitCountMap", result.getTotalHitCountMap());
     }
 
     private void setLocaleVariables(Context context, ResourceBundle i18n) {

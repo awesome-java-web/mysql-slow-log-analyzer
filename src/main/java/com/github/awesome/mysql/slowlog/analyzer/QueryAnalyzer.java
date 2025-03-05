@@ -7,8 +7,10 @@ import lombok.AllArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
 
 @AllArgsConstructor
 public class QueryAnalyzer {
@@ -23,6 +25,7 @@ public class QueryAnalyzer {
         result.setMaxRowsSentQuery(findMaxRowsSentQuery(entries));
         result.setMaxRowsExaminedQuery(findMaxRowsExaminedQuery(entries));
         result.setTopSlowQueries(findTopSlowQueries(entries));
+        result.setTotalHitCountMap(computeTotalHitCountMap(entries));
         return result;
     }
 
@@ -79,6 +82,15 @@ public class QueryAnalyzer {
             .sorted((e1, e2) -> e2.getQueryTimeMillis().compareTo(e1.getQueryTimeMillis()))
             .limit(config.getTopSlowQueries())
             .collect(toList());
+    }
+
+    private Map<String, Long> computeTotalHitCountMap(List<AnalyzableLogEntry> entries) {
+        return entries.stream()
+            .map(AnalyzableLogEntry::getIdentifier)
+            .collect(groupingBy(
+                Function.identity(),
+                counting()
+            ));
     }
 
 }
