@@ -267,7 +267,7 @@
           <td>
             <div class="code-container">
               <pre><code class="sql" th:text="${query.sql}">sql</code></pre>
-              <button class="copy-button" data-clipboard-text="${query.sql}">Copy</button>
+              <button class="copy-button" th:data-clipboard-text="${query.sql}">Copy</button>
             </div>
           </td>
         </tr>
