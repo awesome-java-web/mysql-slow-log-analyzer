@@ -268,8 +268,8 @@
     <table id="top-slow-queries-table">
       <thead>
         <tr>
-          <th th:text="${tableHeaderTimeText}" data-sort="datetime">Time</th>
-          <th th:text="${tableHeaderDatabaseText}" data-sort="database">Database</th>
+          <th class="no-wrap" th:text="${tableHeaderTimeText}" data-sort="datetime">Time</th>
+          <th class="no-wrap" th:text="${tableHeaderDatabaseText}" data-sort="database">Database</th>
           <th class="no-wrap" th:text="${tableHeaderQueryTimeText}" data-sort="queryTimeMillis">Query Time</th>
           <th class="no-wrap" th:text="${tableHeaderLockTimeText}" data-sort="lockTimeMillis">Lock Time</th>
           <th class="no-wrap" th:text="${tableHeaderRowsSentText}" data-sort="rowsSent">Rows Sent</th>
