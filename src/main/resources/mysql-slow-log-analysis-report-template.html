@@ -5,6 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title th:text="${title}">Default Title</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/atom-one-dark.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/languages/sql.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     :root {
@@ -18,7 +21,6 @@
     * {
       margin: 0;
       box-sizing: border-box;
-      font-family: 'Segoe UI', system-ui, sans-serif;
     }
 
     body {
@@ -143,6 +145,36 @@
         overflow-x: auto;
       }
     }
+
+    pre code.hljs {
+      padding: 1em;
+      border-radius: 6px;
+      font-size: 14px;
+      white-space: pre-wrap !important;
+      word-wrap: break-word !important;
+      max-width: 100%;
+      overflow: visible !important;
+    }
+
+    td pre code.hljs {
+      padding: 0.5em;
+      white-space: pre-wrap !important;
+      word-wrap: break-word !important;
+      overflow: visible !important;
+      max-height: none !important;
+    }
+
+    table td:last-child {
+      min-width: 300px;
+      max-width: 600px;
+      vertical-align: top;
+    }
+
+    pre {
+      white-space: pre-wrap !important;
+      word-wrap: break-word !important;
+      overflow: visible !important;
+    }
   </style>
 </head>
 
@@ -194,7 +226,9 @@
           <td class="lock-time" th:text="${query.lockTimeMillis} + 'ms'">lockTimeMillis</td>
           <td th:text="${query.rowsSent}">rowsSent</td>
           <td th:text="${query.rowsExamined}">rowsExamined</td>
-          <td th:text="${query.sql}">sql</td>
+          <td>
+            <pre><code class="hljs" th:text="${query.sql}">sql</code></pre>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -207,18 +241,20 @@
         if (sql) {
           Swal.fire({
             title: 'SQL Query',
-            html: `<pre style="text-align: left; white-space: pre-wrap; word-wrap: break-word;">${sql}</pre>`,
+            html: `<pre><code class="hljs" style="text-align: left; white-space: pre-wrap; word-wrap: break-word;">${sql}</code></pre>`,
             width: '80%',
             confirmButtonText: 'Close',
             confirmButtonColor: '#3498db',
-            customClass: {
-              container: 'swal-container',
-              popup: 'swal-popup',
-              content: 'swal-content'
+            didOpen: () => {
+              document.querySelectorAll('.swal2-content pre code').forEach(block => hljs.highlightElement(block));
             }
           });
         }
       });
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      hljs.highlightAll();
     });
   </script>
 </body>
