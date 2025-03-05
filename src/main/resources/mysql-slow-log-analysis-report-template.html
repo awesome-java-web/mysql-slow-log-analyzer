@@ -209,10 +209,6 @@
     .copy-button.copied {
       background: #27ae60;
     }
-
-    pre code.hljs {
-      padding-right: 50px;
-    }
   </style>
 </head>
 
@@ -319,7 +315,6 @@
             },
             didOpen: () => {
               document.querySelectorAll('.swal2-content pre code').forEach(block => hljs.highlightElement(block));
-              new ClipboardJS('.swal2-content .copy-button');
             }
           });
         }
