@@ -37,11 +37,11 @@ class LocalFileLogReaderTest {
         AnalysisReporter htmlAnalysisReporter = new HtmlAnalysisReporter(config);
         htmlAnalysisReporter.report(analysisResult);
 
-        assertEquals(4277, analyzableLogEntries.size());
+        assertEquals(887, analyzableLogEntries.size());
         assertEquals("33185.268", analysisResult.getSlowestQuery().getQueryTimeMillis().toPlainString());
         assertEquals("2.632", analysisResult.getLongestLockTimeQuery().getLockTimeMillis().toPlainString());
-        assertEquals(12438, analysisResult.getMaxRowsSentQuery().getRowsSent());
-        assertEquals(981484, analysisResult.getMaxRowsExaminedQuery().getRowsExamined());
+        assertEquals(5180, analysisResult.getMaxRowsSentQuery().getRowsSent());
+        assertEquals(981483, analysisResult.getMaxRowsExaminedQuery().getRowsExamined());
     }
 
 }

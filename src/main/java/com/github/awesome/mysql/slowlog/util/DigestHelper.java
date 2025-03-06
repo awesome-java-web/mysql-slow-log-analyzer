@@ -7,7 +7,7 @@ public final class DigestHelper {
 
     private static final String MD5 = "MD5";
 
-    private DigestHelper() {
+    DigestHelper() {
         throw new UnsupportedOperationException("Utility class should not be instantiated");
     }
 

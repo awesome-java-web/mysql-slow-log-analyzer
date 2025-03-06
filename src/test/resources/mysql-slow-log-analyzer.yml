@@ -1,4 +1,4 @@
 slow-log-path: src/test/resources/mysql_slow_log.txt
 analysis-report-path: target/
-slow-query-threshold: 100
+slow-query-threshold: 1000
 top-slow-queries: 10

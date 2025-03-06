@@ -5,6 +5,7 @@ import com.github.awesome.mysql.slowlog.analyzer.model.AnalysisResult;
 import com.github.awesome.mysql.slowlog.config.Config;
 import com.github.awesome.mysql.slowlog.config.ConfigLoader;
 import com.github.awesome.mysql.slowlog.enums.StringSymbols;
+import com.github.awesome.mysql.slowlog.exception.HttpRemoteFileDownloadException;
 import com.github.awesome.mysql.slowlog.parser.LogParser;
 import com.github.awesome.mysql.slowlog.parser.impl.DefaultLogParser;
 import com.github.awesome.mysql.slowlog.parser.model.AnalyzableLogEntry;
@@ -23,7 +24,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class RemoteFileLogReaderTest {
 
@@ -54,13 +55,37 @@ class RemoteFileLogReaderTest {
         htmlAnalysisReporter.report(analysisResult);
 
         lines.close();
+        server.close();
         server.shutdown();
 
-        assertEquals(4277, analyzableLogEntries.size());
+        assertEquals(887, analyzableLogEntries.size());
         assertEquals("33185.268", analysisResult.getSlowestQuery().getQueryTimeMillis().toPlainString());
         assertEquals("2.632", analysisResult.getLongestLockTimeQuery().getLockTimeMillis().toPlainString());
-        assertEquals(12438, analysisResult.getMaxRowsSentQuery().getRowsSent());
-        assertEquals(981484, analysisResult.getMaxRowsExaminedQuery().getRowsExamined());
+        assertEquals(5180, analysisResult.getMaxRowsSentQuery().getRowsSent());
+        assertEquals(981483, analysisResult.getMaxRowsExaminedQuery().getRowsExamined());
+    }
+
+    @Test
+    void testHttpFileLogReaderWithUnsuccessfulResponse() throws IOException {
+        ConfigLoader configLoader = new ConfigLoader();
+        Config config = configLoader.loadFromFile();
+
+        MockWebServer server = new MockWebServer();
+        Path logFilePath = Paths.get(config.getSlowLogPath());
+        final String url = server.url(logFilePath.toString()).toString();
+        MockResponse response = new MockResponse();
+        response.setResponseCode(404);
+        server.enqueue(response);
+
+        HttpRemoteFileDownloadException e = assertThrows(HttpRemoteFileDownloadException.class, () -> {
+            RemoteFileLogReader httpFileLogReader = new HttpFileLogReader();
+            Stream<String> logStream = httpFileLogReader.readAsStream(url);
+            logStream.close();
+        });
+        assertTrue(e.getMessage().contains("Failed to download file from " + url));
+
+        server.close();
+        server.shutdown();
     }
 
 }
