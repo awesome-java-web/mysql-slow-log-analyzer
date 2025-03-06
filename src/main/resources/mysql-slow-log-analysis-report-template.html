@@ -101,9 +101,14 @@
 
     th,
     td {
-      padding: 12px 15px;
+      padding: 8px 0;
       text-align: left;
       border-bottom: 1px solid #ddd;
+    }
+
+    th:first-child,
+    td:first-child {
+      padding-left: 16px;
     }
 
     th {
@@ -113,6 +118,7 @@
       background: var(--primary);
       cursor: pointer;
       user-select: none;
+      z-index: 1;
     }
 
     th:hover {
