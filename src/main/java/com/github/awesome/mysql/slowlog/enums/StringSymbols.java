@@ -13,6 +13,8 @@ public enum StringSymbols {
 
     SPACE(" "),
 
+    NEWLINE("\n"),
+
     SEMICOLON(";"),
 
     SQUARE_BRACKET_LEFT("["),

@@ -20,7 +20,7 @@ public class DefaultLogParser extends AbstractLogParser {
 
     @Override
     public String generateIdentifier(ParsableLogEntry entry) {
-        return DigestHelper.md5Base64Hash(entry.getSql());
+        return DigestHelper.md5(entry.getSql());
     }
 
     @Override

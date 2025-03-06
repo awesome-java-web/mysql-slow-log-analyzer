@@ -1,4 +1,4 @@
-package com.github.awesome.mysql.slowlog;
+package com.github.awesome.mysql.slowlog.reader;
 
 import com.github.awesome.mysql.slowlog.analyzer.QueryAnalyzer;
 import com.github.awesome.mysql.slowlog.analyzer.model.AnalysisResult;
@@ -7,7 +7,6 @@ import com.github.awesome.mysql.slowlog.config.ConfigLoader;
 import com.github.awesome.mysql.slowlog.parser.LogParser;
 import com.github.awesome.mysql.slowlog.parser.impl.DefaultLogParser;
 import com.github.awesome.mysql.slowlog.parser.model.AnalyzableLogEntry;
-import com.github.awesome.mysql.slowlog.reader.LogReader;
 import com.github.awesome.mysql.slowlog.reader.impl.LocalFileLogReader;
 import com.github.awesome.mysql.slowlog.report.AnalysisReporter;
 import com.github.awesome.mysql.slowlog.report.impl.HtmlAnalysisReporter;
@@ -25,14 +24,19 @@ class LocalFileLogReaderTest {
     void testLocalFileLogReader() throws IOException {
         ConfigLoader configLoader = new ConfigLoader();
         Config config = configLoader.loadFromFile();
+
         LogReader localFileLogReader = new LocalFileLogReader();
         Stream<String> logStream = localFileLogReader.readAsStream(config.getSlowLogPath());
+
         LogParser defaultLogParser = new DefaultLogParser(config);
         List<AnalyzableLogEntry> analyzableLogEntries = defaultLogParser.parse(logStream);
+
         QueryAnalyzer queryAnalyzer = new QueryAnalyzer(config);
         AnalysisResult analysisResult = queryAnalyzer.analyze(analyzableLogEntries);
+
         AnalysisReporter htmlAnalysisReporter = new HtmlAnalysisReporter(config);
         htmlAnalysisReporter.report(analysisResult);
+
         assertEquals(4277, analyzableLogEntries.size());
         assertEquals("33185.268", analysisResult.getSlowestQuery().getQueryTimeMillis().toPlainString());
         assertEquals("2.632", analysisResult.getLongestLockTimeQuery().getLockTimeMillis().toPlainString());

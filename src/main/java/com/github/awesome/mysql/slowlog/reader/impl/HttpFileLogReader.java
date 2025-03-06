@@ -14,7 +14,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.stream.Stream;
 
 public class HttpFileLogReader implements RemoteFileLogReader {
@@ -33,9 +32,9 @@ public class HttpFileLogReader implements RemoteFileLogReader {
             Response response = client.newCall(request).execute();
             InputStream byteStream = getResponseInputStream(url, response)
         ) {
-            final String localFileIdentifier = DigestHelper.md5Base64Hash(url);
+            final String localFileIdentifier = DigestHelper.md5(url);
             Path outputPath = Paths.get(String.format("mysql_slow_log_%s.txt", localFileIdentifier));
-            Files.copy(byteStream, outputPath, StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(byteStream, outputPath);
             return outputPath;
         } catch (Exception e) {
             throw new HttpRemoteFileDownloadException("Failed to download file from " + url, e);
