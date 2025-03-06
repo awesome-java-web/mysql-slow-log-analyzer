@@ -18,6 +18,8 @@ import java.util.stream.Stream;
 
 public class HttpFileLogReader implements RemoteFileLogReader {
 
+    private static final String OS_TEMP_DIR = System.getProperty("java.io.tmpdir");
+
     @Override
     public Stream<String> readAsStream(String source) throws IOException {
         Path localFilePath = downloadFile(source);
@@ -33,7 +35,7 @@ public class HttpFileLogReader implements RemoteFileLogReader {
             InputStream byteStream = getResponseInputStream(url, response)
         ) {
             final String localFileIdentifier = DigestHelper.md5(url);
-            Path outputPath = Paths.get(String.format("mysql_slow_log_%s.txt", localFileIdentifier));
+            Path outputPath = Paths.get(OS_TEMP_DIR, String.format("mysql_slow_log_%s.txt", localFileIdentifier));
             Files.copy(byteStream, outputPath);
             return outputPath;
         } catch (Exception e) {

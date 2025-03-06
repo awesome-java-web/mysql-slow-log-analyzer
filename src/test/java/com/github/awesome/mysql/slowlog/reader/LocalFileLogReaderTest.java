@@ -37,6 +37,8 @@ class LocalFileLogReaderTest {
         AnalysisReporter htmlAnalysisReporter = new HtmlAnalysisReporter(config);
         htmlAnalysisReporter.report(analysisResult);
 
+        logStream.close();
+
         assertEquals(887, analyzableLogEntries.size());
         assertEquals("33185.268", analysisResult.getSlowestQuery().getQueryTimeMillis().toPlainString());
         assertEquals("2.632", analysisResult.getLongestLockTimeQuery().getLockTimeMillis().toPlainString());

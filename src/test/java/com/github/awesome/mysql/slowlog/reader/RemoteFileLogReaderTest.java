@@ -57,6 +57,7 @@ class RemoteFileLogReaderTest {
         lines.close();
         server.close();
         server.shutdown();
+        logStream.close();
 
         assertEquals(887, analyzableLogEntries.size());
         assertEquals("33185.268", analysisResult.getSlowestQuery().getQueryTimeMillis().toPlainString());
