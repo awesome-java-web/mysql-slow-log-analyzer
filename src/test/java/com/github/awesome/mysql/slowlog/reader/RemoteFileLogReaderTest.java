@@ -78,11 +78,8 @@ class RemoteFileLogReaderTest {
         response.setResponseCode(404);
         server.enqueue(response);
 
-        HttpRemoteFileDownloadException e = assertThrows(HttpRemoteFileDownloadException.class, () -> {
-            RemoteFileLogReader httpFileLogReader = new HttpFileLogReader();
-            Stream<String> logStream = httpFileLogReader.readAsStream(url);
-            logStream.close();
-        });
+        RemoteFileLogReader httpFileLogReader = new HttpFileLogReader();
+        HttpRemoteFileDownloadException e = assertThrows(HttpRemoteFileDownloadException.class, () -> httpFileLogReader.readAsStream(url));
         assertTrue(e.getMessage().contains("Failed to download file from " + url));
 
         server.close();
