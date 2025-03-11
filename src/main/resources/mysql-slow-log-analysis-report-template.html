@@ -5,7 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title th:text="${title}">Default Title</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/atom-one-dark.min.css">
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/atom-one-dark.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/languages/sql.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script>
@@ -240,6 +241,58 @@
     .copy-button.copied {
       background: #27ae60;
     }
+
+    .stats-metrics {
+      margin-top: 2rem;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .metrics-header {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      background: var(--light);
+      cursor: pointer;
+      user-select: none;
+      border-bottom: 1px solid #eee;
+    }
+
+    .metrics-header:hover {
+      background: #e9ecef;
+    }
+
+    .metrics-header h2 {
+      margin: 0;
+      font-size: 1.5em;
+      color: var(--primary);
+    }
+
+    .metrics-content {
+      transition: max-height 0.3s ease-out;
+      max-height: 2000px;
+      overflow: hidden;
+    }
+
+    .metrics-content.collapsed {
+      max-height: 0;
+    }
+
+    .toggle-icon {
+      margin-right: 0.5rem;
+      font-size: 1.2em;
+      color: var(--primary);
+      transition: transform 0.3s ease;
+    }
+
+    .toggle-icon.collapsed {
+      transform: rotate(-90deg);
+    }
+
+    table {
+      margin-top: 0;
+    }
   </style>
 </head>
 
@@ -270,44 +323,82 @@
       </div>
     </div>
 
-    <h2 th:text="${topSlowQueriesTableTitle}">Top N Slow Queries</h2>
-    <table id="top-slow-queries-table">
-      <thead>
-        <tr>
-          <th class="no-wrap" th:text="${tableHeaderTimeText}" data-sort="datetime">Time</th>
-          <th class="no-wrap" th:text="${tableHeaderDatabaseText}" data-sort="database">Database</th>
-          <th class="no-wrap" th:text="${tableHeaderQueryTimeText}" data-sort="queryTimeMillis">Query Time</th>
-          <th class="no-wrap" th:text="${tableHeaderLockTimeText}" data-sort="lockTimeMillis">Lock Time</th>
-          <th class="no-wrap" th:text="${tableHeaderRowsSentText}" data-sort="rowsSent">Rows Sent</th>
-          <th class="no-wrap" th:text="${tableHeaderRowsExaminedText}" data-sort="rowsExamined">Rows Examined</th>
-          <th class="no-wrap" th:text="${tableHeaderTotalHitCountText}" data-sort="totalHitCount">Total Hit Count</th>
-          <th th:text="${tableHeaderSqlText}">SQL</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr th:each="query : ${topSlowQueries}">
-          <td class="no-wrap" th:text="${query.datetime}">datetime</td>
-          <td class="db-tag" th:text="${query.database}">database</td>
-          <td class="query-time" th:text="${query.queryTimeMillis} + 'ms'">queryTimeMillis</td>
-          <td class="lock-time" th:text="${query.lockTimeMillis} + 'ms'">lockTimeMillis</td>
-          <td th:text="${query.rowsSent}">rowsSent</td>
-          <td th:text="${query.rowsExamined}">rowsExamined</td>
-          <td th:text="${totalHitCountMap.get(query.identifier)}">totalHitCount</td>
-          <td>
-            <div class="code-container">
-              <pre><code class="sql" th:text="${query.sql}">sql</code></pre>
-              <button class="copy-button" th:data-clipboard-text="${query.sql}">Copy</button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="stats-metrics">
+      <div class="metrics-header">
+        <span class="toggle-icon collapsed">▼</span>
+        <h2 th:text="${topSlowQueriesTableTitle}">Top N Slow Queries</h2>
+      </div>
+      <div class="metrics-content collapsed">
+        <table id="top-slow-queries-table">
+          <thead>
+            <tr>
+              <th class="no-wrap" th:text="${tableHeaderTimeText}" data-sort="datetime">Time</th>
+              <th class="no-wrap" th:text="${tableHeaderDatabaseText}" data-sort="database">Database</th>
+              <th class="no-wrap" th:text="${tableHeaderQueryTimeText}" data-sort="queryTimeMillis">Query Time</th>
+              <th class="no-wrap" th:text="${tableHeaderLockTimeText}" data-sort="lockTimeMillis">Lock Time</th>
+              <th class="no-wrap" th:text="${tableHeaderRowsSentText}" data-sort="rowsSent">Rows Sent</th>
+              <th class="no-wrap" th:text="${tableHeaderRowsExaminedText}" data-sort="rowsExamined">Rows Examined</th>
+              <th class="no-wrap" th:text="${tableHeaderTotalHitCountText}" data-sort="totalHitCount">Total Hit Count
+              </th>
+              <th th:text="${tableHeaderSqlText}">SQL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="query : ${topSlowQueries}">
+              <td class="no-wrap" th:text="${query.datetime}">datetime</td>
+              <td class="db-tag" th:text="${query.database}">database</td>
+              <td class="query-time" th:text="${query.queryTimeMillis} + 'ms'">queryTimeMillis</td>
+              <td class="lock-time" th:text="${query.lockTimeMillis} + 'ms'">lockTimeMillis</td>
+              <td th:text="${query.rowsSent}">rowsSent</td>
+              <td th:text="${query.rowsExamined}">rowsExamined</td>
+              <td th:text="${totalHitCountMap.get(query.identifier)}">totalHitCount</td>
+              <td>
+                <div class="code-container">
+                  <pre><code class="sql" th:text="${query.sql}">sql</code></pre>
+                  <button class="copy-button" th:data-clipboard-text="${query.sql}">Copy</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <script>
+    document.querySelectorAll('.stat-card').forEach(card => {
+      card.addEventListener('click', function () {
+        const sql = this.getAttribute('data-sql');
+        if (sql) {
+          Swal.fire({
+            title: 'SQL Query',
+            html: `
+              <div class="code-container">
+                <pre><code class="hljs">${sql}</code></pre>
+                <button class="copy-button" data-clipboard-text="${sql}">Copy</button>
+              </div>
+            `,
+            width: '80%',
+            confirmButtonText: 'Close',
+            confirmButtonColor: '#3498db',
+            customClass: {
+              container: 'swal2-container',
+              popup: 'swal2-popup',
+              content: 'swal2-content',
+              htmlContainer: 'swal2-html-container'
+            },
+            didOpen: () => {
+              document.querySelectorAll('.swal2-content pre code').forEach(block => hljs.highlightElement(block));
+            }
+          });
+        }
+      });
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
       hljs.highlightAll();
       initTableSort();
+      initMetricsCollapse();
     });
 
     function initTableSort() {
@@ -392,34 +483,25 @@
       e.clearSelection();
     });
 
-    document.querySelectorAll('.stat-card').forEach(card => {
-      card.addEventListener('click', function () {
-        const sql = this.getAttribute('data-sql');
-        if (sql) {
-          Swal.fire({
-            title: 'SQL Query',
-            html: `
-              <div class="code-container">
-                <pre><code class="hljs">${sql}</code></pre>
-                <button class="copy-button" data-clipboard-text="${sql}">Copy</button>
-              </div>
-            `,
-            width: '80%',
-            confirmButtonText: 'Close',
-            confirmButtonColor: '#3498db',
-            customClass: {
-              container: 'swal2-container',
-              popup: 'swal2-popup',
-              content: 'swal2-content',
-              htmlContainer: 'swal2-html-container'
-            },
-            didOpen: () => {
-              document.querySelectorAll('.swal2-content pre code').forEach(block => hljs.highlightElement(block));
-            }
-          });
+    function initMetricsCollapse() {
+      const header = document.querySelector('.metrics-header');
+      const content = document.querySelector('.metrics-content');
+      const icon = document.querySelector('.toggle-icon');
+
+      let isCollapsed = true;
+
+      header.addEventListener('click', () => {
+        isCollapsed = !isCollapsed;
+
+        if (isCollapsed) {
+          content.classList.add('collapsed');
+          icon.classList.add('collapsed');
+        } else {
+          content.classList.remove('collapsed');
+          icon.classList.remove('collapsed');
         }
       });
-    });
+    }
   </script>
 </body>
 
