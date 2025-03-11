@@ -5,11 +5,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title th:text="${title}">Default Title</title>
-  <link rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/atom-one-dark.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/atom-one-dark.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/languages/sql.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     :root {
@@ -293,6 +293,12 @@
     table {
       margin-top: 0;
     }
+
+    #query-time-distribution-chart {
+      width: 100%;
+      height: 400px;
+      padding: 20px;
+    }
   </style>
 </head>
 
@@ -363,6 +369,16 @@
         </table>
       </div>
     </div>
+
+    <div class="stats-metrics">
+      <div class="metrics-header">
+        <span class="toggle-icon collapsed">▼</span>
+        <h2 th:text="${queryTimeDistributionChartTitle}">Query Time Distribution Chart</h2>
+      </div>
+      <div class="metrics-content collapsed">
+        <div id="query-time-distribution-chart"></div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -399,6 +415,7 @@
       hljs.highlightAll();
       initTableSort();
       initMetricsCollapse();
+      initQueryTimeDistributionChart();
     });
 
     function initTableSort() {
@@ -484,22 +501,114 @@
     });
 
     function initMetricsCollapse() {
-      const header = document.querySelector('.metrics-header');
-      const content = document.querySelector('.metrics-content');
-      const icon = document.querySelector('.toggle-icon');
+      const metricsContainers = document.querySelectorAll('.stats-metrics');
 
-      let isCollapsed = true;
+      metricsContainers.forEach(container => {
+        const header = container.querySelector('.metrics-header');
+        const content = container.querySelector('.metrics-content');
+        const icon = container.querySelector('.toggle-icon');
 
-      header.addEventListener('click', () => {
-        isCollapsed = !isCollapsed;
+        let isCollapsed = true;
 
-        if (isCollapsed) {
-          content.classList.add('collapsed');
-          icon.classList.add('collapsed');
-        } else {
-          content.classList.remove('collapsed');
-          icon.classList.remove('collapsed');
+        header.addEventListener('click', () => {
+          isCollapsed = !isCollapsed;
+
+          if (isCollapsed) {
+            content.classList.add('collapsed');
+            icon.classList.add('collapsed');
+          } else {
+            content.classList.remove('collapsed');
+            icon.classList.remove('collapsed');
+          }
+        });
+      });
+    }
+
+    function initQueryTimeDistributionChart() {
+      const chart = echarts.init(document.getElementById('query-time-distribution-chart'));
+
+      const generateFakeData = () => {
+        const data = [];
+        const intervals = 10;
+        for (let i = 0; i < intervals; i++) {
+          const start = i * 500;
+          const end = (i + 1) * 500;
+          data.push({
+            interval: `${start}-${end}ms`,
+            count: Math.floor(Math.random() * 50) + 1
+          });
         }
+        return data;
+      };
+
+      const fakeData = generateFakeData();
+
+      const option = {
+        title: {
+          text: 'Query Time Distribution',
+          left: 'center',
+          top: 10
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
+          },
+          formatter: function(params) {
+            const data = params[0];
+            return `${data.name}<br/>Count: ${data.value}`;
+          }
+        },
+        grid: {
+          left: '5%',
+          right: '5%',
+          bottom: '10%',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'category',
+          data: fakeData.map(item => item.interval),
+          axisLabel: {
+            interval: 0,
+            rotate: 45
+          },
+          name: 'Time Range',
+          nameLocation: 'middle',
+          nameGap: 35
+        },
+        yAxis: {
+          type: 'value',
+          name: 'Query Count',
+          nameLocation: 'middle',
+          nameGap: 40
+        },
+        series: [{
+          name: 'Query Count',
+          type: 'bar',
+          data: fakeData.map(item => item.count),
+          itemStyle: {
+            color: '#3498db'
+          },
+          emphasis: {
+            itemStyle: {
+              color: '#2c3e50'
+            }
+          }
+        }]
+      };
+
+      chart.setOption(option);
+
+      window.addEventListener('resize', () => {
+        chart.resize();
+      });
+
+      document.querySelectorAll('.metrics-header').forEach(header => {
+        header.addEventListener('click', () => {
+          setTimeout(() => {
+            chart.resize();
+          }, 300);
+        });
       });
     }
   </script>
