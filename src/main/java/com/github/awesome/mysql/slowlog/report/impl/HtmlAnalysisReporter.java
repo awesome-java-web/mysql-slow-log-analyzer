@@ -44,7 +44,7 @@ public class HtmlAnalysisReporter implements AnalysisReporter {
         templateEngine.setTemplateResolver(templateResolver);
 
         Context context = new Context();
-        setNoLocaleVariables(context, result);
+        setNoneLocaleVariables(context, result);
         setLocaleVariables(context, i18n);
 
         final String html = templateEngine.process(HtmlAnalysisReporter.HTML_TEMPLATE_NAME, context);
@@ -54,7 +54,7 @@ public class HtmlAnalysisReporter implements AnalysisReporter {
         Files.write(Paths.get(config.getAnalysisReportPath(), reportName), html.getBytes(StandardCharsets.UTF_8));
     }
 
-    private void setNoLocaleVariables(Context context, AnalysisResult result) {
+    private void setNoneLocaleVariables(Context context, AnalysisResult result) {
         context.setVariable("totalSlowQueries", result.getTotalSlowQueries());
         context.setVariable("slowestQuery", result.getSlowestQuery());
         context.setVariable("longestLockTimeQuery", result.getLongestLockTimeQuery());
@@ -62,6 +62,7 @@ public class HtmlAnalysisReporter implements AnalysisReporter {
         context.setVariable("maxRowsExaminedQuery", result.getMaxRowsExaminedQuery());
         context.setVariable("topSlowQueries", result.getTopSlowQueries());
         context.setVariable("totalHitCountMap", result.getTotalHitCountMap());
+        context.setVariable("queryTimeDistributionBarChartData", result.getQueryTimeDistributionBarChartData());
     }
 
     private void setLocaleVariables(Context context, ResourceBundle i18n) {

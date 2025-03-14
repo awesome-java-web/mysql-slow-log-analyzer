@@ -27,4 +27,6 @@ public class AnalysisResult implements Serializable {
     private List<AnalyzableLogEntry> topSlowQueries;
 
     private Map<String, Long> totalHitCountMap;
+
+    private List<QueryTimeDistributionBarChartItem> queryTimeDistributionBarChartData;
 }

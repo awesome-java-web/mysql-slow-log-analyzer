@@ -1,11 +1,13 @@
 package com.github.awesome.mysql.slowlog.analyzer;
 
 import com.github.awesome.mysql.slowlog.analyzer.model.AnalysisResult;
+import com.github.awesome.mysql.slowlog.analyzer.model.QueryTimeDistributionBarChartItem;
 import com.github.awesome.mysql.slowlog.config.Config;
 import com.github.awesome.mysql.slowlog.parser.model.AnalyzableLogEntry;
 import lombok.AllArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -26,6 +28,7 @@ public class QueryAnalyzer {
         result.setMaxRowsExaminedQuery(findMaxRowsExaminedQuery(entries));
         result.setTopSlowQueries(findTopSlowQueries(entries));
         result.setTotalHitCountMap(computeTotalHitCountMap(entries));
+        result.setQueryTimeDistributionBarChartData(computeQueryTimeDistributionBarChartData(entries));
         return result;
     }
 
@@ -91,6 +94,29 @@ public class QueryAnalyzer {
                 Function.identity(),
                 counting()
             ));
+    }
+
+    private List<QueryTimeDistributionBarChartItem> computeQueryTimeDistributionBarChartData(List<AnalyzableLogEntry> entries) {
+        List<QueryTimeDistributionBarChartItem> result = new ArrayList<>();
+        for (int i = 0; i < 11; i++) {
+            QueryTimeDistributionBarChartItem item = new QueryTimeDistributionBarChartItem();
+            if (i == 10) {
+                item.setIntervalText("> 5000ms");
+            } else {
+                item.setIntervalText(String.format("%d-%dms", i * 500, (i + 1) * 500));
+            }
+            item.setCount(0);
+            result.add(item);
+        }
+
+        for (AnalyzableLogEntry entry : entries) {
+            final int intervalIndex = Math.min(entry.getQueryTimeMillis().intValue() / 500, 10);
+            QueryTimeDistributionBarChartItem item = result.get(intervalIndex);
+            item.setCount(item.getCount() + 1);
+            result.set(intervalIndex, item);
+        }
+
+        return result;
     }
 
 }

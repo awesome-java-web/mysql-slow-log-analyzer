@@ -381,7 +381,7 @@
     </div>
   </div>
 
-  <script>
+  <script th:inline="javascript">
     document.querySelectorAll('.stat-card').forEach(card => {
       card.addEventListener('click', function () {
         const sql = this.getAttribute('data-sql');
@@ -525,23 +525,9 @@
     }
 
     function initQueryTimeDistributionChart() {
+      const chartData = /*[[${queryTimeDistributionBarChartData}]]*/ [{intervalText: '0-500ms', count: 1}];
+
       const chart = echarts.init(document.getElementById('query-time-distribution-chart'));
-
-      const generateFakeData = () => {
-        const data = [];
-        const intervals = 10;
-        for (let i = 0; i < intervals; i++) {
-          const start = i * 500;
-          const end = (i + 1) * 500;
-          data.push({
-            interval: `${start}-${end}ms`,
-            count: Math.floor(Math.random() * 50) + 1
-          });
-        }
-        return data;
-      };
-
-      const fakeData = generateFakeData();
 
       const option = {
         title: {
@@ -556,7 +542,7 @@
           },
           formatter: function(params) {
             const data = params[0];
-            return `${data.name}<br/>Count: ${data.value}`;
+            return `${data.name}<br/>Count = ${data.value}`;
           }
         },
         grid: {
@@ -567,10 +553,9 @@
         },
         xAxis: {
           type: 'category',
-          data: fakeData.map(item => item.interval),
+          data: chartData.map(item => item.intervalText),
           axisLabel: {
-            interval: 0,
-            rotate: 45
+            interval: 0
           },
           name: 'Time Range',
           nameLocation: 'middle',
@@ -585,7 +570,7 @@
         series: [{
           name: 'Query Count',
           type: 'bar',
-          data: fakeData.map(item => item.count),
+          data: chartData.map(item => item.count),
           itemStyle: {
             color: '#3498db'
           },
