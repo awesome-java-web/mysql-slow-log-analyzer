@@ -13,10 +13,12 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 
 @AllArgsConstructor
 public abstract class AbstractLogParser implements LogParser {
@@ -53,7 +55,17 @@ public abstract class AbstractLogParser implements LogParser {
         List<String> rawLogLines = new ArrayList<>();
         List<ParsableLogEntry> parsableLogEntries = new ArrayList<>();
 
-        rawLogStream.forEach(line -> {
+        List<String> rawLogList = rawLogStream.collect(toList());
+        Iterator<String> iterator = rawLogList.iterator();
+        while (iterator.hasNext()) {
+            final String line = iterator.next();
+            if (line.startsWith(LogLineIdentifier.LOG_TIME.getPrefix())) {
+                break;
+            }
+            iterator.remove();
+        }
+
+        for (String line : rawLogList) {
             final boolean isNewLogEntryStarted = line.startsWith(LogLineIdentifier.LOG_TIME.getPrefix());
             if (isNewLogEntryStarted && !rawLogLines.isEmpty()) {
                 ParsableLogEntry parsableLogEntry = transform(rawLogLines);
@@ -61,7 +73,7 @@ public abstract class AbstractLogParser implements LogParser {
                 rawLogLines.clear();
             }
             rawLogLines.add(line);
-        });
+        }
 
         // The last raw log entry
         ParsableLogEntry parsableLogEntry = transform(rawLogLines);
