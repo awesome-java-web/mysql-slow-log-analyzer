@@ -9,7 +9,6 @@ import com.github.awesome.mysql.slowlog.parser.model.ParsableLogEntry;
 import lombok.AllArgsConstructor;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -42,7 +41,6 @@ public abstract class AbstractLogParser implements LogParser {
             analyzableLogEntry.setLockTimeMillis(parseLockTimeMillis(parsableLogEntry));
             analyzableLogEntry.setRowsSent(parseRowsSent(parsableLogEntry));
             analyzableLogEntry.setRowsExamined(parseRowsExamined(parsableLogEntry));
-            analyzableLogEntry.setRowsEfficiency(calculateRowsEfficiency(analyzableLogEntry));
             analyzableLogEntry.setTimestamp(parseTimestamp(parsableLogEntry));
             analyzableLogEntry.setDatetime(formatTimestamp(analyzableLogEntry.getTimestamp()));
             analyzableLogEntry.setSql(parsableLogEntry.getSql());
@@ -81,12 +79,6 @@ public abstract class AbstractLogParser implements LogParser {
         final String sql = sqlStatements.stream().map(String::trim).collect(joining(StringSymbols.SPACE.getSymbol()));
         parsableLogEntry.setSql(sql);
         return parsableLogEntry;
-    }
-
-    private BigDecimal calculateRowsEfficiency(AnalyzableLogEntry analyzableLogEntry) {
-        BigDecimal rowsSent = BigDecimal.valueOf(analyzableLogEntry.getRowsSent());
-        BigDecimal rowsExamined = BigDecimal.valueOf(analyzableLogEntry.getRowsExamined());
-        return rowsSent.divide(rowsExamined, AnalyzableLogEntry.DEFAULT_BIG_DECIMAL_SCALE, RoundingMode.HALF_UP);
     }
 
     private String formatTimestamp(long timestamp) {

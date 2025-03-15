@@ -12,8 +12,6 @@ import java.math.BigDecimal;
 @ToString
 public class AnalyzableLogEntry implements Serializable {
 
-    public static final int DEFAULT_BIG_DECIMAL_SCALE = 6;
-
     private String identifier;
 
     private String host;
@@ -29,8 +27,6 @@ public class AnalyzableLogEntry implements Serializable {
     private long rowsSent;
 
     private long rowsExamined;
-
-    private BigDecimal rowsEfficiency;
 
     private long timestamp;
 
