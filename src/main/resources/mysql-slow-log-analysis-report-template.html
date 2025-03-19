@@ -4,229 +4,366 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title th:text="${title}">Default Title</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/atom-one-dark.min.css">
+  <title th:text="${title}">MySQL Slow Query Log Analysis Report</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Code Highlighting -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/github-dark.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/languages/sql.min.js"></script>
+  <!-- Clipboard.js -->
   <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script>
+  <!-- ECharts -->
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+  <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
   <style>
     :root {
-      --primary: #2c3e50;
-      --secondary: #3498db;
-      --light: #f8f9fa;
-      --success: #27ae60;
-      --danger: #e74c3c;
+      /* Modern color palette */
+      --primary: #2563eb;        /* Bright blue */
+      --primary-dark: #1e40af;   /* Dark blue */
+      --primary-light: #93c5fd;  /* Light blue */
+      --secondary: #14b8a6;      /* Teal */
+      --accent: #f97316;         /* Orange */
+      --danger: #ef4444;         /* Red */
+      --success: #10b981;        /* Green */
+      --warning: #f59e0b;        /* Amber */
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+
+      /* Font sizes */
+      --text-xs: 0.75rem;
+      --text-sm: 0.875rem;
+      --text-base: 1rem;
+      --text-lg: 1.125rem;
+      --text-xl: 1.25rem;
+      --text-2xl: 1.5rem;
+      --text-3xl: 1.875rem;
+      --text-4xl: 2.25rem;
+
+      /* Spacing */
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --space-12: 3rem;
+      --space-16: 4rem;
+
+      /* Radius */
+      --radius-sm: 0.125rem;
+      --radius-md: 0.375rem;
+      --radius-lg: 0.5rem;
+      --radius-xl: 0.75rem;
+      --radius-2xl: 1rem;
+      --radius-full: 9999px;
+
+      /* Shadows */
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+      /* Transitions */
+      --transition-normal: all 0.2s ease;
+      --transition-slow: all 0.3s ease;
     }
 
     * {
       margin: 0;
+      padding: 0;
       box-sizing: border-box;
     }
 
     body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
       line-height: 1.6;
-      padding: 2rem 1rem;
-      background: #f1f4f8;
+      background-color: var(--gray-100);
+      color: var(--gray-800);
+      padding: var(--space-6) var(--space-4);
     }
 
     .container {
       margin: 0 auto;
-      padding: 2rem;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: var(--space-8);
+      background-color: white;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
     }
 
-    h1 {
-      margin-bottom: 2rem;
-      font-size: 2.2em;
+    .page-header {
       text-align: center;
-      color: var(--primary);
+      margin-bottom: var(--space-8);
     }
 
+    .page-title {
+      font-size: var(--text-3xl);
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: var(--space-2);
+    }
+
+    /* Stats Grid */
     .stats-grid {
       display: grid;
-      gap: 1.5rem;
-      margin-bottom: 3rem;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: var(--space-6);
+      margin-bottom: var(--space-12);
       opacity: 0;
-      animation: fadeIn 0.8s ease-out forwards;
+      animation: fadeInUp 0.8s ease-out forwards;
     }
 
-    .stat-card {
-      padding: 1.5rem;
-      border-radius: 8px;
-      background: var(--light);
-      border-left: 4px solid var(--secondary);
-      transition: all 0.3s ease;
-      transform: translateY(0);
-      cursor: pointer;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-      background: white;
-    }
-
-    @keyframes fadeIn {
+    @keyframes fadeInUp {
       from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(var(--space-6));
       }
-
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
 
-    .stat-value {
-      font-size: 2em;
-      font-weight: bold;
-      color: var(--primary);
-    }
-
-    .stat-label {
-      font-size: 0.9em;
-      color: #7f8c8d;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    th,
-    td {
-      padding: 8px 0;
-      text-align: left;
-      border-bottom: 1px solid #ddd;
-    }
-
-    th:first-child,
-    td:first-child {
-      padding-left: 16px;
-    }
-
-    th {
-      position: sticky;
-      top: 0;
-      color: white;
-      background: var(--primary);
+    .stat-card {
+      padding: var(--space-6);
+      background-color: white;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      border-left: 4px solid var(--primary);
+      transition: var(--transition-normal);
+      position: relative;
+      overflow: hidden;
       cursor: pointer;
-      user-select: none;
+    }
+
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to right, var(--primary-light) 0%, transparent 100%);
+      opacity: 0;
+      z-index: 0;
+      transition: var(--transition-normal);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .stat-card:hover::after {
+      opacity: 0.05;
+    }
+
+    .stat-value {
+      font-size: var(--text-3xl);
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: var(--space-2);
+      position: relative;
       z-index: 1;
     }
 
-    th:hover {
-      background: #3a506b;
+    .stat-label {
+      font-size: var(--text-sm);
+      color: var(--gray-500);
+      position: relative;
+      z-index: 1;
     }
 
-    th::after {
+    /* Metrics Panel */
+    .stats-metrics {
+      margin-top: var(--space-8);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background-color: white;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--gray-200);
+      position: relative;
+    }
+
+    .metrics-header {
+      display: flex;
+      align-items: center;
+      padding: var(--space-4) var(--space-6);
+      background-color: white;
+      border-bottom: 1px solid var(--gray-200);
+      cursor: pointer;
+      user-select: none;
+      transition: var(--transition-normal);
+    }
+
+    .metrics-header:hover {
+      background-color: var(--gray-50);
+    }
+
+    .metrics-header h2 {
+      margin: 0;
+      font-size: var(--text-xl);
+      color: var(--gray-800);
+      font-weight: 600;
+    }
+
+    .toggle-icon {
+      margin-right: var(--space-3);
+      color: var(--primary);
+      font-size: var(--text-lg);
+      transition: transform 0.3s ease;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .toggle-icon.collapsed {
+      transform: rotate(-90deg);
+    }
+
+    .metrics-content {
+      transition: max-height 0.3s ease-out;
+      max-height: 2000px;
+      overflow: auto;
+    }
+
+    .metrics-content.collapsed {
+      max-height: 0;
+      overflow: hidden;
+    }
+
+    /* Table Styles */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-sm);
+    }
+
+    .data-table th {
+      position: sticky;
+      top: 0;
+      background-color: var(--primary);
+      color: white;
+      text-align: left;
+      padding: var(--space-3) var(--space-4);
+      font-weight: 500;
+      z-index: 5;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .data-table th:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .data-table th::after {
       content: '';
       display: inline-block;
       width: 0;
       height: 0;
-      margin-left: 8px;
+      margin-left: var(--space-2);
       vertical-align: middle;
       border-left: 4px solid transparent;
       border-right: 4px solid transparent;
     }
 
-    th.asc::after {
+    .data-table th.asc::after {
       border-bottom: 4px solid white;
     }
 
-    th.desc::after {
+    .data-table th.desc::after {
       border-top: 4px solid white;
     }
 
-    tr:hover {
-      background-color: #f5f5f5;
+    .data-table td {
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--gray-200);
+      vertical-align: top;
+    }
+
+    .data-table tr:hover {
+      background-color: var(--gray-50);
     }
 
     .query-time {
-      font-weight: bold;
+      font-weight: 600;
       color: var(--danger);
     }
 
     .lock-time {
-      font-weight: bold;
-      color: var(--secondary);
+      font-weight: 600;
+      color: var(--primary);
     }
 
     .db-tag {
-      font-weight: bold;
+      font-weight: 600;
       color: var(--success);
+      display: inline-block;
+      padding: var(--space-1) var(--space-2);
+      background-color: rgba(16, 185, 129, 0.1);
+      border-radius: var(--radius-md);
     }
 
     .no-wrap {
       white-space: nowrap;
     }
 
-    @media (max-width: 768px) {
-      .container {
-        padding: 1rem;
-      }
-
-      table {
-        display: block;
-        overflow-x: auto;
-      }
+    /* Code Styling */
+    .code-container {
+      position: relative;
+      margin: 0;
+      border-radius: var(--radius-md);
+      overflow: hidden;
     }
 
     pre code.hljs {
-      padding: 1em;
       text-align: left;
-      border-radius: 6px;
-      font-size: 14px;
+      padding: var(--space-4);
+      font-size: var(--text-sm);
+      line-height: 1.5;
+      border-radius: var(--radius-md);
       white-space: pre-wrap !important;
       word-wrap: break-word !important;
       max-width: 100%;
       overflow: visible !important;
     }
 
-    td pre code.hljs {
-      padding: 0.5em;
-      white-space: pre-wrap !important;
-      word-wrap: break-word !important;
-      overflow: visible !important;
-      max-height: none !important;
-    }
-
-    table td:last-child {
-      min-width: 300px;
-      max-width: 600px;
-      vertical-align: top;
-    }
-
-    pre {
-      white-space: pre-wrap !important;
-      word-wrap: break-word !important;
-      overflow: visible !important;
-    }
-
-    .code-container {
-      position: relative;
-      margin: 0;
-    }
-
     .copy-button {
       position: absolute;
-      top: 5px;
-      right: 5px;
-      padding: 4px 8px;
-      background: rgba(255, 255, 255, 0.1);
+      top: var(--space-2);
+      right: var(--space-2);
+      padding: var(--space-1) var(--space-3);
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
       border: none;
-      border-radius: 4px;
-      color: #fff;
-      font-size: 12px;
+      border-radius: var(--radius-md);
+      font-size: var(--text-xs);
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: var(--transition-normal);
       opacity: 0;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .copy-button i {
+      font-size: 12px;
     }
 
     .code-container:hover .copy-button {
@@ -234,70 +371,106 @@
     }
 
     .copy-button:hover {
-      background: rgba(255, 255, 255, 0.2);
+      background-color: rgba(255, 255, 255, 0.2);
     }
 
     .copy-button.copied {
-      background: #27ae60;
+      background-color: var(--success);
     }
 
-    .stats-metrics {
-      margin-top: 2rem;
-      border: 1px solid #eee;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    .metrics-header {
-      display: flex;
-      align-items: center;
-      padding: 1rem;
-      background: var(--light);
-      cursor: pointer;
-      user-select: none;
-      border-bottom: 1px solid #eee;
-    }
-
-    .metrics-header:hover {
-      background: #e9ecef;
-    }
-
-    .metrics-header h2 {
-      margin: 0;
-      font-size: 1.5em;
-      color: var(--primary);
-    }
-
-    .metrics-content {
-      transition: max-height 0.3s ease-out;
-    }
-
-    .metrics-content.collapsed {
-      max-height: 0;
-    }
-
-    .toggle-icon {
-      margin-right: 0.5rem;
-      font-size: 1.2em;
-      color: var(--primary);
-      transition: transform 0.3s ease;
-    }
-
-    .toggle-icon.collapsed {
-      transform: rotate(-90deg);
-    }
-
+    /* Chart Container */
     #query-time-distribution-chart {
       width: 100%;
       height: 400px;
-      padding: 20px;
+      padding: var(--space-6);
+    }
+
+    /* Float Button */
+    .float-button {
+      position: fixed;
+      right: var(--space-8);
+      bottom: var(--space-8);
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-full);
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-lg);
+      transition: var(--transition-normal);
+      z-index: 1000;
+    }
+
+    .float-button:hover {
+      transform: scale(1.05);
+      background-color: var(--primary-dark);
+      box-shadow: var(--shadow-xl);
+    }
+
+    .float-button i {
+      font-size: var(--text-xl);
+      transition: var(--transition-normal);
+    }
+
+    .float-button i.collapsed {
+      transform: rotate(-180deg);
+    }
+
+    .float-button::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      right: 65px;
+      padding: var(--space-2) var(--space-3);
+      background-color: var(--gray-800);
+      color: white;
+      border-radius: var(--radius-md);
+      font-size: var(--text-xs);
+      opacity: 0;
+      transition: var(--transition-normal);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .float-button:hover::after {
+      opacity: 1;
+    }
+
+    /* Responsive */
+    @media screen and (max-width: 768px) {
+      .container {
+        padding: var(--space-4);
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .data-table {
+        display: block;
+        overflow-x: auto;
+      }
+
+      .float-button {
+        right: var(--space-4);
+        bottom: var(--space-4);
+      }
+
+      .data-table th {
+        top: 48px; /* Adjusted for mobile */
+      }
     }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <h1 th:text="${title}">Default Title</h1>
+    <header class="page-header">
+      <h1 class="page-title" th:text="${title}">MySQL Slow Query Log Analysis Report</h1>
+    </header>
 
     <div class="stats-grid">
       <div class="stat-card">
@@ -324,11 +497,11 @@
 
     <div class="stats-metrics">
       <div class="metrics-header">
-        <span class="toggle-icon collapsed">▼</span>
-        <h2 th:text="${topSlowQueriesTableTitle}">Top N Slow Queries</h2>
+        <i class="toggle-icon fa-solid fa-chevron-down collapsed"></i>
+        <h2 th:text="${topSlowQueriesTableTitle}">Top Slow Queries</h2>
       </div>
       <div class="metrics-content collapsed">
-        <table id="top-slow-queries-table">
+        <table class="data-table" id="top-slow-queries-table">
           <thead>
             <tr>
               <th class="no-wrap" th:text="${tableHeaderTimeText}" data-sort="datetime">Time</th>
@@ -337,15 +510,14 @@
               <th class="no-wrap" th:text="${tableHeaderLockTimeText}" data-sort="lockTimeMillis">Lock Time</th>
               <th class="no-wrap" th:text="${tableHeaderRowsSentText}" data-sort="rowsSent">Rows Sent</th>
               <th class="no-wrap" th:text="${tableHeaderRowsExaminedText}" data-sort="rowsExamined">Rows Examined</th>
-              <th class="no-wrap" th:text="${tableHeaderTotalHitCountText}" data-sort="totalHitCount">Total Hit Count
-              </th>
+              <th class="no-wrap" th:text="${tableHeaderTotalHitCountText}" data-sort="totalHitCount">Total Hit Count</th>
               <th th:text="${tableHeaderSqlText}">SQL</th>
             </tr>
           </thead>
           <tbody>
             <tr th:each="query : ${topSlowQueries}">
               <td class="no-wrap" th:text="${query.datetime}">datetime</td>
-              <td class="db-tag" th:text="${query.database}">database</td>
+              <td><span class="db-tag" th:text="${query.database}">database</span></td>
               <td class="query-time" th:text="${query.queryTimeMillis} + 'ms'">queryTimeMillis</td>
               <td class="lock-time" th:text="${query.lockTimeMillis} + 'ms'">lockTimeMillis</td>
               <td th:text="${query.rowsSent}">rowsSent</td>
@@ -353,8 +525,10 @@
               <td th:text="${totalHitCountMap.get(query.identifier)}">totalHitCount</td>
               <td>
                 <div class="code-container">
-                  <pre><code class="sql" th:text="${query.sql}">sql</code></pre>
-                  <button class="copy-button" th:data-clipboard-text="${query.sql}">Copy</button>
+                  <pre><code class="sql" th:text="${query.sql}">SELECT * FROM users;</code></pre>
+                  <button class="copy-button" th:data-clipboard-text="${query.sql}">
+                    <i class="fa-regular fa-copy"></i> Copy
+                  </button>
                 </div>
               </td>
             </tr>
@@ -365,16 +539,21 @@
 
     <div class="stats-metrics">
       <div class="metrics-header">
-        <span class="toggle-icon collapsed">▼</span>
-        <h2 th:text="${queryTimeDistributionChartTitle}">Query Time Distribution Chart</h2>
+        <i class="toggle-icon fa-solid fa-chevron-down collapsed"></i>
+        <h2 th:text="${queryTimeDistributionChartTitle}">Query Time Distribution</h2>
       </div>
       <div class="metrics-content collapsed">
         <div id="query-time-distribution-chart"></div>
       </div>
     </div>
+
+    <button class="float-button" id="toggle-all-panels-button" data-tooltip="Expand all panels">
+      <i class="fa-solid fa-chevron-down"></i>
+    </button>
   </div>
 
   <script th:inline="javascript">
+    // Show SQL details when clicking on stat cards
     document.querySelectorAll('.stat-card').forEach(card => {
       card.addEventListener('click', function () {
         const sql = this.getAttribute('data-sql');
@@ -383,13 +562,16 @@
             title: 'SQL Query',
             html: `
               <div class="code-container">
-                <pre><code class="hljs">${sql}</code></pre>
-                <button class="copy-button" data-clipboard-text="${sql}">Copy</button>
+                <pre><code class="hljs sql">${sql}</code></pre>
+                <button class="copy-button" data-clipboard-text="${sql}">
+                  <i class="fa-regular fa-copy"></i> Copy
+                </button>
               </div>
             `,
             width: '80%',
             confirmButtonText: 'Close',
-            confirmButtonColor: '#3498db',
+            confirmButtonColor: '#2563eb',
+            heightAuto: false,
             customClass: {
               container: 'swal2-container',
               popup: 'swal2-popup',
@@ -404,13 +586,16 @@
       });
     });
 
+    // Initialize all components on page load
     document.addEventListener('DOMContentLoaded', () => {
       hljs.highlightAll();
       initTableSort();
       initMetricsCollapse();
       initQueryTimeDistributionChart();
+      initToggleAllPanelsButton();
     });
 
+    // Table sorting functionality
     function initTableSort() {
       const table = document.getElementById('top-slow-queries-table');
       const headers = table.querySelectorAll('th');
@@ -464,6 +649,7 @@
       });
     }
 
+    // Helper function to get cell value for sorting
     function getCellValue(row, key) {
       const rowCells = Array.from(row.parentNode.querySelector('tr').cells);
       const cellIndex = rowCells.findIndex(cell => cell.closest('table').querySelector(`th[data-sort="${key}"]`).cellIndex === cell.cellIndex);
@@ -479,22 +665,27 @@
       return value;
     }
 
+    // Initialize clipboard.js for copying SQL queries
     const clipboard = new ClipboardJS('.copy-button');
     clipboard.on('success', function (e) {
       const button = e.trigger;
-      button.textContent = 'Copied!';
+      const originalText = button.innerHTML;
+      button.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
       button.classList.add('copied');
 
       setTimeout(() => {
-        button.textContent = 'Copy';
+        button.innerHTML = originalText;
         button.classList.remove('copied');
       }, 2000);
 
       e.clearSelection();
     });
 
+    // Initialize collapsible metrics panels
     function initMetricsCollapse() {
       const metricsContainers = document.querySelectorAll('.stats-metrics');
+      const floatButton = document.getElementById('toggle-all-panels-button');
+      const floatIcon = floatButton.querySelector('i');
 
       metricsContainers.forEach(container => {
         const header = container.querySelector('.metrics-header');
@@ -513,10 +704,29 @@
             content.classList.remove('collapsed');
             icon.classList.remove('collapsed');
           }
+
+          // Check if all panels are in the same state
+          const allContainers = document.querySelectorAll('.stats-metrics');
+          const allCollapsed = Array.from(allContainers).every(
+            c => c.querySelector('.metrics-content').classList.contains('collapsed')
+          );
+          const allExpanded = Array.from(allContainers).every(
+            c => !c.querySelector('.metrics-content').classList.contains('collapsed')
+          );
+
+          // Update float button state
+          if (allCollapsed) {
+            floatIcon.classList.add('collapsed');
+            floatButton.setAttribute('data-tooltip', 'Expand all panels');
+          } else if (allExpanded) {
+            floatIcon.classList.remove('collapsed');
+            floatButton.setAttribute('data-tooltip', 'Collapse all panels');
+          }
         });
       });
     }
 
+    // Initialize query time distribution chart
     function initQueryTimeDistributionChart() {
       const chartData = /*[[${queryTimeDistributionBarChartData}]]*/ [{intervalText: '0-500ms', count: 1}];
 
@@ -526,7 +736,12 @@
         title: {
           text: 'Query Time Distribution',
           left: 'center',
-          top: 10
+          top: 10,
+          textStyle: {
+            fontWeight: 'normal',
+            fontSize: 16,
+            color: '#374151'
+          }
         },
         tooltip: {
           trigger: 'axis',
@@ -535,7 +750,12 @@
           },
           formatter: function(params) {
             const data = params[0];
-            return `${data.name}<br/>Count = ${data.value}`;
+            return `${data.name}<br/>Count: <strong>${data.value}</strong>`;
+          },
+          backgroundColor: 'rgba(0, 0, 0, 0.75)',
+          borderWidth: 0,
+          textStyle: {
+            color: '#fff'
           }
         },
         grid: {
@@ -547,46 +767,100 @@
         xAxis: {
           type: 'category',
           data: chartData.map(item => item.intervalText),
-          axisLabel: {
-            interval: 0
-          },
           name: 'Time Range',
           nameLocation: 'middle',
-          nameGap: 35
+          nameGap: 35,
+          axisTick: {
+            alignWithLabel: true
+          }
         },
         yAxis: {
           type: 'value',
           name: 'Query Count',
           nameLocation: 'middle',
-          nameGap: 40
+          nameGap: 40,
+          splitLine: {
+            lineStyle: {
+              type: 'dashed',
+              color: '#e5e7eb'
+            }
+          }
         },
         series: [{
           name: 'Query Count',
           type: 'bar',
           data: chartData.map(item => item.count),
           itemStyle: {
-            color: '#3498db'
+            color: '#2563eb',
+            borderRadius: [4, 4, 0, 0]
           },
           emphasis: {
             itemStyle: {
-              color: '#2c3e50'
+              color: '#1e40af'
             }
-          }
+          },
+          barWidth: '60%'
         }]
       };
 
       chart.setOption(option);
 
+      // Resize chart when window size changes
       window.addEventListener('resize', () => {
         chart.resize();
       });
 
+      // Resize chart when panel is toggled
       document.querySelectorAll('.metrics-header').forEach(header => {
         header.addEventListener('click', () => {
           setTimeout(() => {
             chart.resize();
           }, 300);
         });
+      });
+    }
+
+    // Initialize toggle all panels button
+    function initToggleAllPanelsButton() {
+      const button = document.getElementById('toggle-all-panels-button');
+      const icon = button.querySelector('i');
+      let isAllCollapsed = true;  // Initial state is all collapsed
+
+      button.addEventListener('click', () => {
+        const metricsContainers = document.querySelectorAll('.stats-metrics');
+        isAllCollapsed = !isAllCollapsed;
+
+        metricsContainers.forEach(container => {
+          const content = container.querySelector('.metrics-content');
+          const headerIcon = container.querySelector('.toggle-icon');
+
+          if (isAllCollapsed) {
+            content.classList.add('collapsed');
+            headerIcon.classList.add('collapsed');
+          } else {
+            content.classList.remove('collapsed');
+            headerIcon.classList.remove('collapsed');
+          }
+        });
+
+        // Update float button icon state
+        if (isAllCollapsed) {
+          icon.classList.add('collapsed');
+          button.setAttribute('data-tooltip', 'Expand all panels');
+        } else {
+          icon.classList.remove('collapsed');
+          button.setAttribute('data-tooltip', 'Collapse all panels');
+        }
+
+        // Resize chart if panels are expanded
+        if (!isAllCollapsed) {
+          setTimeout(() => {
+            const chart = echarts.getInstanceByDom(document.getElementById('query-time-distribution-chart'));
+            if (chart) {
+              chart.resize();
+            }
+          }, 300);
+        }
       });
     }
   </script>
